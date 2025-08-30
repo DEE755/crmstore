@@ -52,6 +52,13 @@ public class ConsoleCustomerDisplay implements CustomerDisplayInterface {
 
     }
 
+
+    @Override
+    public boolean addCustomer(Customer customer) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'addCustomer'");
+    }
+
     
 
 }

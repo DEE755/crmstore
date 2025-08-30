@@ -1,13 +1,15 @@
 package main;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
-import login.Login;
 import model.Employee;
 import model.customer.Customer;
 import serialization.CustomerSerializer;
 import serialization.EmployeeSerializer;
+import servercommunication.ServerCom;
+import servercommunication.login.Login;
 import view.ConsoleCustomerDisplay;
 import view.ConsoleEmployeeDisplay;
 import view.ConsoleMenuDisplay;
@@ -19,22 +21,39 @@ public class Main {
     private static CustomerSerializer customerSerializer = new CustomerSerializer();
     private static EmployeeSerializer employeeSerializer = new EmployeeSerializer();
 
-    private static Employee currentEmployee = null;
+    private static Optional<Employee> currentEmployee = Optional.empty();
     private static ConsoleEmployeeDisplay employeeDisplay = new ConsoleEmployeeDisplay();
     private static ConsoleMenuDisplay menuDisplay = new ConsoleMenuDisplay();
 
-    private static Login login = new Login();
+    private static ServerCom serverCom = new ServerCom();
+    
+    private static Login login = new Login(serverCom);
     
     public static void main(String[] args) throws IOException, ClassNotFoundException {
+        try {
+            serverCom.ServerConnection();
+
+            String serverMessage=serverCom.reader.readLine();
+            System.out.println("Message from server: " + serverMessage);
+            
+
+        } catch (IOException e) {
+            System.err.println("Error connecting to server: " + e.getMessage());
+            return;
+        }
+
         System.out.println("=== WELCOME TO MANAGEMENT SYSTEM ===\nPLEASE LOGIN TO CONTINUE");
         
         boolean running = true;
 
         while(running)
         {
-            currentEmployee = login.authenticate(employeeSerializer.loadEmployeeList("employees.ser"));
-            if(currentEmployee != null)
-                break;
+            currentEmployee = login.authenticate();
+            //System.out.println(currentEmployee);
+            if(currentEmployee.isPresent()) 
+            break;
+            
+            else 
             System.err.println("Login failed. Please try again.");
         }
         

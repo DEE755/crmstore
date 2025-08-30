@@ -1,11 +1,11 @@
-package login;
+package servercommunication.login;
 
-import java.util.List;
+import java.util.Optional;
 
 import model.Employee;
 
 public interface LoginInterface {
-    Employee authenticate(List<Employee> employees);
+    Optional<Employee> authenticate();
     void logout();
     boolean isLoggedIn();
 }
