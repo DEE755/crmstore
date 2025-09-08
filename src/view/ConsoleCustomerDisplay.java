@@ -2,7 +2,6 @@ package view;
 
 import java.util.List;
 import java.util.Scanner;
-
 import model.customer.Customer;
 import model.customer.NewCustomer;
 
@@ -50,6 +49,13 @@ public class ConsoleCustomerDisplay implements CustomerDisplayInterface {
         Customer newCustomer = new NewCustomer(name, email, phoneNumber);
         return newCustomer;
 
+    }
+
+
+    @Override
+    public boolean addCustomer(Customer customer) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'addCustomer'");
     }
 
     

@@ -28,4 +28,16 @@ public static JSONObject EmployeeToJSON(Employee employee) {
     json.put("phoneNumber", employee.getPhoneNumber());
     return json;
 }
+
+
+public static String employeeToString(Employee employee) {
+    String employeeString = employee.getId() + " " +
+                            employee.getName() + " " +
+                            employee.getUsername() + " " +
+                            employee.getPassword() + " " +
+                            employee.getEmail() + " " +
+                            employee.getPhoneNumber();
+    return employeeString;  
+}
+
 }

@@ -167,9 +167,10 @@ public class Main {
                     employeeDisplay.displayEmployeeList(employeeSerializer.loadEmployeeList());
                     break;
                 case "2":
-                serverCom.sendCommand("Add Employee");
-                   Employee newEmployee = employeeDisplay.createNewEmployee();
-                   employeeSerializer.saveEmployeeToServer(newEmployee);
+                    Employee newEmployee = employeeDisplay.createNewEmployee();
+                    System.err.println("Created new employee: " + newEmployee.toString());
+                    serverCom.sendCommand("AddEmployee " + util.TypeConverter.employeeToString(newEmployee) + "\n");
+                
                     break;
                 case "3":
                     inEmployeeMenu = false;

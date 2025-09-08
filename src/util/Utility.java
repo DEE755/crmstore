@@ -4,14 +4,13 @@ import java.io.IOException;
 import java.util.List;
 import model.customer.Customer;
 import serialization.CustomerSerializer;
-import serialization.EmployeeSerializer;
 
 
 
 public class Utility {
 
 private static CustomerSerializer customerSerializer = new CustomerSerializer();
-private static EmployeeSerializer employeeSerializer = new EmployeeSerializer();
+//private static EmployeeSerializer employeeSerializer = new EmployeeSerializer();
 
     public static int calculateLastId() {
 
