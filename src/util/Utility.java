@@ -21,14 +21,25 @@ private static CustomerSerializer customerSerializer = new CustomerSerializer(se
 //private static EmployeeSerializer employeeSerializer = new EmployeeSerializer();
 
     public static int calculateLastId() {
-
+        String responseString;
         try {
-            List<Customer> customers = customerSerializer.loadCustomerList();
+            responseString = serverCom.sendCommandAndGetResponse("ListCustomers", util.Constants.VERBOSE_OVERRIDE);
+            if (responseString.equals("EMPTY")) {
+                System.err.println("No customers in the server yet. Starting IDs from 1.");
+                return 1; //start IDs from 1 if there are no customers yet
+            }
+
+            if (responseString.equals("SUCCESS")) {
+             
+            List<Customer> customers = customerSerializer.loadCustomerListFromServerText();
+            System.out.println("after checkpoint");
+
             if (!customers.isEmpty()) {
                 return customers.get(customers.size() - 1).getId() + 1;
             }
+        }
         } catch (IOException | ClassNotFoundException e) {
-            System.err.println("No customer data found. Starting IDs from 1.");
+            System.err.println("Error calculating last ID: " + e.getMessage());
         }
 
         return 1; 

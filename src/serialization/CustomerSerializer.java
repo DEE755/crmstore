@@ -31,13 +31,15 @@ public class CustomerSerializer {
 
 
 
-    public List<Customer> loadCustomerListFromText() throws IOException, ClassNotFoundException {
+    public List<Customer> loadCustomerListFromServerText() throws IOException, ClassNotFoundException {
    
         try {
+            System.out.println("Before readline");
             String customerListRawText = serverCom.reader.readLine();
+            System.out.println("After readline: " + customerListRawText);
 
             List<Customer> customers = new ArrayList<Customer>();
-            
+
             while (!customerListRawText.equals("ENDLIST")) {
                 System.out.println("Received customer data: " + customerListRawText);
                 Customer customer = util.TypeConverter.stringToCustomer(customerListRawText);
@@ -56,40 +58,11 @@ public class CustomerSerializer {
 
 
 
-    public void deleteCustomer2(int customer_id) throws IOException, ClassNotFoundException {
-       try {
-           socket.getOutputStream().write(("DELETECUSTOMER " + customer_id + "\n").getBytes());
-
-       } catch (IOException e) {
-           System.err.println("Error writing to server socket: " + e.getMessage());
-       }
-    }
-
-    public void deleteCustomer(int customer_id) throws IOException, ClassNotFoundException {
-       try {
-           List<Customer> customers = loadCustomerList();
-           customers.removeIf(c -> c.getId() == customer_id);
-           saveCustomerList(customers);
-       } catch (IOException e) {
-           System.err.println("Error loading customer list: " + e.getMessage());
-       }
-    }
-
     public void saveCustomerList(List<Customer> customers) throws IOException {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(util.Constants.CUSTOMER_DATA_FILE))) {
             out.writeObject(customers);
         }
     }
     
-    @SuppressWarnings("unchecked")
-    public List<Customer> loadCustomerList() throws IOException, ClassNotFoundException {
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(util.Constants.CUSTOMER_DATA_FILE))) {
-            return (List<Customer>) in.readObject();
-        }
-        catch (IOException | ClassNotFoundException e) {
-            // If the file does not exist or is empty, return an empty list
-            System.err.println("There is no customer data available. Please add customers first.");
-            return new java.util.ArrayList<>();
-        }
-    }
+    
 }

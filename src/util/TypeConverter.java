@@ -64,31 +64,29 @@ public static Employee StringToEmployee(String employeeString) {
 public static Customer stringToCustomer(String customerInfoString) {
     Customer newCustomer=null;
     String[] parts = customerInfoString.split(" ");
-    if (parts.length != 1 && parts.length != 6) {
+    if (parts.length != 1 && parts.length != 7) {
         throw new IllegalArgumentException("Invalid customer string: " + customerInfoString);
     }
     System.err.println("Parts length: " + parts.length);
     int id = Integer.parseInt(parts[0]);
-    String name = parts[1];
-    String email = parts[2];
-    String phoneNumber = parts[3];
-    double discount = Double.parseDouble(parts[4]);
+    String firstName = parts[1];
+    String familyName = parts[2];
+    String email = parts[3];
+    String phoneNumber = parts[4];
+    double discount = Double.parseDouble(parts[5]);
 
-    switch (parts[5]) {
+    switch (parts[6]) {
         case "NewCustomer":
-            newCustomer = new NewCustomer(id, name,email, phoneNumber, discount);
-            System.out.println("Creating a NewCustomer object: ");
+            newCustomer = new NewCustomer(id, firstName, familyName, email, phoneNumber, discount);
             break;
         case "ReturningCustomer":
-            newCustomer = new ReturningCustomer(id, name,email, phoneNumber, discount);
-            System.out.println("Creating a ReturningCustomer object: ");
+            newCustomer = new ReturningCustomer(id, firstName, familyName, email, phoneNumber, discount);
             break;
         case "VIPCustomer":
-            newCustomer = new VIPCustomer(id, name,email, phoneNumber, discount);
-            System.out.println("Creating a VIPCustomer object: ");
+            newCustomer = new VIPCustomer(id, firstName, familyName, email, phoneNumber, discount);
             break;
         default:
-            throw new IllegalArgumentException("Unknown customer type: " + parts[5]);
+            throw new IllegalArgumentException("Unknown customer type: " + parts[6]);
     }
     return newCustomer;
 
@@ -96,7 +94,8 @@ public static Customer stringToCustomer(String customerInfoString) {
 
 public static String customerToString(Customer customer) {
     String customerString = customer.getId() + " " +
-                            customer.getFullname() + " " +
+                            customer.getFirstName() + " " +
+                            customer.getFamilyName() + " " +
                             customer.getEmail() + " " +
                             customer.getPhoneNumber() + " " +
                             customer.getDiscount() + " " +

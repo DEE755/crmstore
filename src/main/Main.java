@@ -26,6 +26,7 @@ public class Main {
     private static ConsoleEmployeeDisplay employeeDisplay = new ConsoleEmployeeDisplay();
     private static ConsoleMenuDisplay menuDisplay = new ConsoleMenuDisplay();
 
+    private static String responseString;
     
     
     
@@ -101,13 +102,19 @@ public class Main {
                 try{
                     if (viewOrDelete)
                     {
-                consoleCustomerDisplay.displayCustomerDetails(customers.get(customerId-1));
+                    consoleCustomerDisplay.displayCustomerDetails(customers.get(Customer.findCustomerIndexById(customers, customerId)));
                 
                     }
                     else{
-                        System.out.println("Customer deleted: " + customers.get(customerId).getFullname());
-                        customerSerializer.deleteCustomer(customerId);
-                        
+                        String responseString=serverCom.sendCommandAndGetResponse("ListCustomers DELETEMODE " + customerId + "\n", util.Constants.VERBOSE_OVERRIDE);
+
+
+                        if (responseString.equals("SUCCESS")) {
+                            System.out.println("Customer with ID " + customerId + " has been deleted successfully.");
+                        } else 
+                        {
+                            System.err.println("Failed to delete customer with ID " + customerId + ". Please ensure the ID is correct.");
+                        }
                     
                     }
                     
@@ -139,25 +146,23 @@ public class Main {
         
         while (inCustomerMenu) {
             String choice = menuDisplay.displayCustomerManagementMenu();
-            String responseString="";
+            
             
             switch (choice) {
                 
                 case "1"://View all customers
                  responseString=serverCom.sendCommandAndGetResponse("ListCustomers", util.Constants.VERBOSE_OVERRIDE);
 
-                
-
                     if (responseString.equals("SUCCESS")) {
                         System.out.println("Receiving customers data from server...");
-                        List<Customer> customers = customerSerializer.loadCustomerListFromText();
+                        List<Customer> customers = customerSerializer.loadCustomerListFromServerText();
                         System.out.println("Loaded " + customers.size() + " customers.");
                          viewAllCustomers(true, customers);   
 
                     } 
 
                     else if (responseString.equals("EMPTY")) {
-                        System.err.println("No customer data found, please add customers first.");
+                        System.err.println("No customer data in the server yet.");
         
                     }
 
@@ -165,15 +170,15 @@ public class Main {
                     break;
 
                 case "2"://Add new customer
-
+                    System.out.println("=== ADD NEW CUSTOMER ===");
                     Customer newCustomer = consoleCustomerDisplay.createNewCustomer();
 
-                    System.err.println("Created new customer: " + newCustomer.toString());
+                    System.out.println("Created new customer: " + newCustomer.toString());
                     responseString=serverCom.sendCommandAndGetResponse("AddCustomer " + util.TypeConverter.customerToString(newCustomer) + "\n", true);
                     serverCom.emptyBuffer();
 
                    if (responseString.equals("SUCCESS")) {
-                       System.out.println("New customer added: " + newCustomer.getFullname());
+                       System.out.println("New customer added: " + newCustomer.getFirstName());
                    } else {
                        System.err.println("Failed to add new customer.");
                    }
@@ -181,15 +186,15 @@ public class Main {
                     
                     break;
 
-                    case "3":
+                    case "3": //Delete customer
 
-                    responseString=serverCom.sendCommandAndGetResponse("DeleteCustomer", util.Constants.VERBOSE_OVERRIDE);
+                    responseString=serverCom.sendCommandAndGetResponse("ListCustomers", util.Constants.VERBOSE_OVERRIDE);
 
                     System.out.println("Response from server: " + responseString);
 
                     if (responseString.equals("SUCCESS")) {
                         System.out.println("Receiving customers data from server...");
-                        List<Customer> customers = customerSerializer.loadCustomerListFromText();
+                        List<Customer> customers = customerSerializer.loadCustomerListFromServerText();
                          viewAllCustomers(false, customers);
 
                          menuDisplay.promptToContinue();
@@ -211,7 +216,6 @@ public class Main {
 
     private static void employeeManagement() throws IOException, ClassNotFoundException {
         boolean inEmployeeMenu = true;
-         String responseString;
         
         while (inEmployeeMenu) {
             String choice = menuDisplay.displayEmployeeManagementMenu();
