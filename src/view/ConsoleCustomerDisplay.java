@@ -35,7 +35,7 @@ public class ConsoleCustomerDisplay implements CustomerDisplayInterface {
     {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter customer name:");
-        String name = scanner.nextLine();
+        String name = scanner.nextLine().replace(" ", "-");
         System.out.println("Enter customer email:");
         String email = scanner.nextLine();
         System.out.println("Enter customer phone number:");

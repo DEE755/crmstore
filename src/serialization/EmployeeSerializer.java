@@ -22,56 +22,8 @@ public class EmployeeSerializer {
         this.socket = serverCom.getSocket();
     }
     
-    public void saveEmployeeToServer2(Employee employee) throws IOException, ClassNotFoundException {
-        JSONObject employeeInfo = null;
-        try {
-            System.err.println("Converting employee to JSON: " + employee);
-            //CONVERT OBJECT EMPLOYEE TO JSON
-           employeeInfo = util.TypeConverter.EmployeeToJSON(employee);
-        } catch (Exception e) {
-           System.err.println("Error converting employee to JSON: " + e.getMessage());
-        }
+    
 
-        //SEND JSON TO SERVER
-        if (employeeInfo != null) {
-            System.err.println("Sending employee data to server: " + employeeInfo.toString());
-            socket.getOutputStream().write((employeeInfo.toString()+"\n").getBytes());
-            socket.getOutputStream().flush();
-        }
-
-        if (serverCom.reader.readLine().equals("SUCCESS")) {
-            System.out.println("Employee saved successfully.");
-        } else {
-            System.err.println("Failed to save employee.");
-        }
-    }
-
-
-
-     public void employeeToString(Employee employee) throws IOException, ClassNotFoundException {
-       String employeeInfo = null;
-        try {
-            System.err.println("Converting employee to JSON: " + employee);
-            //CONVERT OBJECT EMPLOYEE TO JSON
-           employeeInfo = util.TypeConverter.EmployeeToString(employee);
-
-        } catch (Exception e) {
-           System.err.println("Error converting employee to JSON: " + e.getMessage());
-        }
-
-        //SEND JSON TO SERVER
-        if (employeeInfo != null) {
-            System.err.println("Sending employee data to server: " + employeeInfo.toString());
-            socket.getOutputStream().write((employeeInfo.toString()+"\n").getBytes());
-            socket.getOutputStream().flush();
-        }
-
-        if (serverCom.reader.readLine().equals("SUCCESS")) {
-            System.out.println("Employee saved successfully.");
-        } else {
-            System.err.println("Failed to save employee.");
-        }
-    }
 
     public Employee loadEmployee(int employee_id) throws IOException, ClassNotFoundException {
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream("employee_" + employee_id + ".ser"))) {
@@ -116,4 +68,6 @@ public class EmployeeSerializer {
             return new java.util.ArrayList<>();
         }
     }
+
+    
 }

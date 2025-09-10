@@ -37,7 +37,7 @@ public class ConsoleMenuDisplay
     }
     public void promptToContinue()
     {
-        System.out.println("Press Enter to continue...");
+        System.out.println("\nPress Enter to continue...\n");
         scanner.nextLine();
     
     }

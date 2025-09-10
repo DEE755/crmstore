@@ -12,6 +12,19 @@ public class ServerCom
 private Socket socket;
 public BufferedReader reader;
 private PrintWriter writer;
+private static ServerCom instance;
+
+    public ServerCom() 
+    {
+        if (instance != null) {
+            throw new IllegalStateException("ServerCom instance already exists. Use getInstance() to access it.");
+        }
+        instance = this;
+    }
+
+public static ServerCom getInstance() {
+    return instance;
+    }
 
 public Socket getSocket(){
     return this.socket;
@@ -24,9 +37,18 @@ public void ServerConnection() throws IOException {
         writer = new PrintWriter(socket.getOutputStream(), true);
     }
 
-    public String sendCommandAndGetResponse(String command) throws IOException {
+    public String sendCommandAndGetResponse(String command, boolean verbose) throws IOException 
+    {
+        String responseString;
         writer.println(command);
-        return reader.readLine();
+        responseString = reader.readLine();
+
+        if (verbose) {
+            System.out.println("Sent command to server: " + command);
+            System.out.println("Response from server: " + responseString);
+        }
+        
+        return responseString;
     }
 
     public void emptyBuffer() throws IOException {

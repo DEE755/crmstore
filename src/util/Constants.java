@@ -7,4 +7,5 @@ public class Constants {
     public static final String ADMIN_PASSWORD = "admin123";
     public static final int PORT = 1234;
     public static final String HOST = "localhost";
+    public static final boolean VERBOSE_OVERRIDE = true;
 }

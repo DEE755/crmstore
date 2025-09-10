@@ -35,7 +35,7 @@ public class Login implements LoginInterface {
 
         try
         {
-            String response = this.serverCom.sendCommandAndGetResponse("Login " + enteredUsername + " " + enteredPassword);
+            String response = this.serverCom.sendCommandAndGetResponse("Login " + enteredUsername + " " + enteredPassword, true);
             String employeeInfo = "";
 
             System.out.println("Response: " + response);

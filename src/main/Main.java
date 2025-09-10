@@ -18,7 +18,7 @@ public class Main {
     private static ConsoleCustomerDisplay consoleCustomerDisplay = new ConsoleCustomerDisplay();
 
     private static ServerCom serverCom = new ServerCom();
-    private static CustomerSerializer customerSerializer = new CustomerSerializer();
+    private static CustomerSerializer customerSerializer = new CustomerSerializer(serverCom);
     private static EmployeeSerializer employeeSerializer = null;
     private static Login login = new Login(serverCom);
     
@@ -80,18 +80,20 @@ public class Main {
 
         }
     }
-    
-    private static void viewAllCustomers(boolean viewOrDelete) throws IOException, ClassNotFoundException {
+
+    private static void viewAllCustomers(boolean viewOrDelete, List<Customer> customers) throws IOException, ClassNotFoundException {
         System.out.println("\n=== ALL CUSTOMERS ===");
         
-        List<Customer> customers = customerSerializer.loadCustomerList("customers.ser");
-        consoleCustomerDisplay.displayCustomerList(customers);
         
-        if (viewOrDelete){
+        consoleCustomerDisplay.displayCustomerList(customers);
+
+        if (viewOrDelete) {
             System.out.println("\nWrite the ID of the Customer you want to see and press Enter to continue... Or cancel by pressing Enter without typing anything.");
         }
         else {System.out.println("\nWrite the ID of the Customer you want to delete and press Enter to continue... Or cancel by pressing Enter without typing anything.");}
         String input = scanner.nextLine();
+        
+        
         if (!input.trim().isEmpty()) {
             try {
                 int customerId = Integer.parseInt(input);
@@ -108,7 +110,7 @@ public class Main {
                         
                     
                     }
-                    menuDisplay.promptToContinue();
+                    
                 }
                 catch(IndexOutOfBoundsException e)
                 {
@@ -121,8 +123,12 @@ public class Main {
             } catch (NumberFormatException e) {
                 System.out.println("Invalid ID format.");
             }
+            finally {
+                menuDisplay.promptToContinue();
+            }
+
         }
-        menuDisplay.promptToContinue();
+        
 
 
 
@@ -133,20 +139,65 @@ public class Main {
         
         while (inCustomerMenu) {
             String choice = menuDisplay.displayCustomerManagementMenu();
+            String responseString="";
             
             switch (choice) {
-                case "1":
-                    viewAllCustomers(true);
+                
+                case "1"://View all customers
+                 responseString=serverCom.sendCommandAndGetResponse("ListCustomers", util.Constants.VERBOSE_OVERRIDE);
+
+                
+
+                    if (responseString.equals("SUCCESS")) {
+                        System.out.println("Receiving customers data from server...");
+                        List<Customer> customers = customerSerializer.loadCustomerListFromText();
+                        System.out.println("Loaded " + customers.size() + " customers.");
+                         viewAllCustomers(true, customers);   
+
+                    } 
+
+                    else if (responseString.equals("EMPTY")) {
+                        System.err.println("No customer data found, please add customers first.");
+        
+                    }
+
+
                     break;
-                case "2":
-                   Customer newCustomer = consoleCustomerDisplay.createNewCustomer();
-                   customerSerializer.saveCustomer(newCustomer, "customers.ser");
-                   
-                   System.out.println("New customer added: " + newCustomer.getFullname());
+
+                case "2"://Add new customer
+
+                    Customer newCustomer = consoleCustomerDisplay.createNewCustomer();
+
+                    System.err.println("Created new customer: " + newCustomer.toString());
+                    responseString=serverCom.sendCommandAndGetResponse("AddCustomer " + util.TypeConverter.customerToString(newCustomer) + "\n", true);
+                    serverCom.emptyBuffer();
+
+                   if (responseString.equals("SUCCESS")) {
+                       System.out.println("New customer added: " + newCustomer.getFullname());
+                   } else {
+                       System.err.println("Failed to add new customer.");
+                   }
+                    menuDisplay.promptToContinue();
+                    
                     break;
 
                     case "3":
-                    viewAllCustomers(false);
+
+                    responseString=serverCom.sendCommandAndGetResponse("DeleteCustomer", util.Constants.VERBOSE_OVERRIDE);
+
+                    System.out.println("Response from server: " + responseString);
+
+                    if (responseString.equals("SUCCESS")) {
+                        System.out.println("Receiving customers data from server...");
+                        List<Customer> customers = customerSerializer.loadCustomerListFromText();
+                         viewAllCustomers(false, customers);
+
+                         menuDisplay.promptToContinue();
+
+                    } else {
+                        System.err.println("Failed to receive employee data.");
+                        break;
+                    }
 
                 case "4":
                     inCustomerMenu = false;
@@ -160,15 +211,15 @@ public class Main {
 
     private static void employeeManagement() throws IOException, ClassNotFoundException {
         boolean inEmployeeMenu = true;
+         String responseString;
         
         while (inEmployeeMenu) {
             String choice = menuDisplay.displayEmployeeManagementMenu();
             
             switch (choice) {
-                case "1":
-                    String responseString=serverCom.sendCommandAndGetResponse("ListEmployees");
-                    
-                    
+                case "1"://View all employees
+                    responseString=serverCom.sendCommandAndGetResponse("ListEmployees", util.Constants.VERBOSE_OVERRIDE);
+
                     System.out.println("Response from server: " + responseString);
 
                     if (responseString.equals("SUCCESS")) {
@@ -183,16 +234,20 @@ public class Main {
                     menuDisplay.promptToContinue();
 
                     break;
-                case "2":
+
+                case "2"://Add new employee
                     Employee newEmployee = employeeDisplay.createNewEmployee();
                     System.err.println("Created new employee: " + newEmployee.toString());
-                    serverCom.sendCommandAndGetResponse("AddEmployee " + util.TypeConverter.employeeToString(newEmployee) + "\n");
+                    responseString=serverCom.sendCommandAndGetResponse("AddEmployee " + util.TypeConverter.employeeToString(newEmployee) + "\n", true);
+                    System.err.println("Response from server: " + responseString);
                     serverCom.emptyBuffer();
                 
                     break;
-                case "3":
+
+                case "3"://Return to main menu
                     inEmployeeMenu = false;
                     break;
+
                 default:
                     System.out.println("Invalid option! Please try again.");
             }
