@@ -40,4 +40,20 @@ public static String employeeToString(Employee employee) {
     return employeeString;  
 }
 
+public static Employee StringToEmployee(String employeeString) {
+    String[] parts = employeeString.split(" ");
+    if (parts.length != 1 && parts.length != 6) {
+        throw new IllegalArgumentException("Invalid employee string: " + employeeString);
+    }
+    System.err.println("Parts length: " + parts.length);
+    int id = Integer.parseInt(parts[0]);
+    String name = parts[1];
+    String username = parts[2];
+    String password = parts[3];
+    String email = parts[4];
+    String phoneNumber = parts[5];
+    return new Employee(id, name, username, password, email, phoneNumber);
+
+}
+
 }

@@ -28,12 +28,6 @@ public class ConsoleCustomerDisplay implements CustomerDisplayInterface {
     }
 
 
-    public void promptToContinue()
-    {
-        System.out.println("Press Enter to return to Customer List...");
-        scanner.nextLine();
-    
-    }
 
 
    

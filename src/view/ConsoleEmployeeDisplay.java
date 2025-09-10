@@ -2,7 +2,6 @@ package view;
 
 import java.util.List;
 import java.util.Scanner;
-
 import model.Employee;
 
 public class ConsoleEmployeeDisplay  {
@@ -28,12 +27,7 @@ public class ConsoleEmployeeDisplay  {
     }
 
 
-    public void promptToContinue()
-    {
-        System.out.println("Press Enter to return to Employee List...");
-        scanner.nextLine();
-    
-    }
+   
 
 
 

@@ -35,7 +35,7 @@ public class Login implements LoginInterface {
 
         try
         {
-            String response = this.serverCom.sendCommand("Login " + enteredUsername + " " + enteredPassword);
+            String response = this.serverCom.sendCommandAndGetResponse("Login " + enteredUsername + " " + enteredPassword);
             String employeeInfo = "";
 
             System.out.println("Response: " + response);
@@ -46,6 +46,7 @@ public class Login implements LoginInterface {
             else {
                 System.out.println("Login successful!");
                 employeeInfo = serverCom.reader.readLine();
+                serverCom.emptyBuffer();
             }
             
 

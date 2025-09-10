@@ -24,11 +24,16 @@ public void ServerConnection() throws IOException {
         writer = new PrintWriter(socket.getOutputStream(), true);
     }
 
-    public String sendCommand(String command) throws IOException {
+    public String sendCommandAndGetResponse(String command) throws IOException {
         writer.println(command);
         return reader.readLine();
     }
 
+    public void emptyBuffer() throws IOException {
+        while (reader.ready()) {
+            reader.readLine();
+        }
+    }
 
 
     public void close() throws IOException {

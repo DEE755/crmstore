@@ -1,11 +1,14 @@
 package serialization;
 
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.BaseStream;
 import model.Employee;
 import servercommunication.ServerCom;
 import util.*;
@@ -51,7 +54,7 @@ public class EmployeeSerializer {
             System.err.println("Converting employee to JSON: " + employee);
             //CONVERT OBJECT EMPLOYEE TO JSON
            employeeInfo = util.TypeConverter.EmployeeToString(employee);
-           
+
         } catch (Exception e) {
            System.err.println("Error converting employee to JSON: " + e.getMessage());
         }
@@ -88,6 +91,26 @@ public class EmployeeSerializer {
             return (List<Employee>) in.readObject();
         }
         catch (IOException | ClassNotFoundException e) {
+            // If the file does not exist or is empty, return an empty list
+            System.err.println("There is no employee data available. Please add employees first.");
+            return new java.util.ArrayList<>();
+        }
+    }
+
+    public List<Employee> loadEmployeeListFromText() throws IOException, ClassNotFoundException {
+        BufferedReader reader = serverCom.reader;
+        try {
+            String employeeListRawText;
+
+
+            List<Employee> employees = new ArrayList<Employee>();
+            while ((employeeListRawText = reader.readLine()) != null && !employeeListRawText.isEmpty()) {
+                Employee employee = util.TypeConverter.StringToEmployee(employeeListRawText);
+                employees.add(employee);
+            }
+            return employees;
+        }
+        catch (IOException e) {
             // If the file does not exist or is empty, return an empty list
             System.err.println("There is no employee data available. Please add employees first.");
             return new java.util.ArrayList<>();

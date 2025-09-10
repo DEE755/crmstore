@@ -15,7 +15,7 @@ import view.ConsoleMenuDisplay;
 
 public class Main {
     private static Scanner scanner = new Scanner(System.in);
-    private static ConsoleCustomerDisplay customerDisplay = new ConsoleCustomerDisplay();
+    private static ConsoleCustomerDisplay consoleCustomerDisplay = new ConsoleCustomerDisplay();
 
     private static ServerCom serverCom = new ServerCom();
     private static CustomerSerializer customerSerializer = new CustomerSerializer();
@@ -85,7 +85,7 @@ public class Main {
         System.out.println("\n=== ALL CUSTOMERS ===");
         
         List<Customer> customers = customerSerializer.loadCustomerList("customers.ser");
-        customerDisplay.displayCustomerList(customers);
+        consoleCustomerDisplay.displayCustomerList(customers);
         
         if (viewOrDelete){
             System.out.println("\nWrite the ID of the Customer you want to see and press Enter to continue... Or cancel by pressing Enter without typing anything.");
@@ -99,7 +99,7 @@ public class Main {
                 try{
                     if (viewOrDelete)
                     {
-                customerDisplay.displayCustomerDetails(customers.get(customerId-1));
+                consoleCustomerDisplay.displayCustomerDetails(customers.get(customerId-1));
                 
                     }
                     else{
@@ -108,7 +108,7 @@ public class Main {
                         
                     
                     }
-                customerDisplay.promptToContinue();
+                    menuDisplay.promptToContinue();
                 }
                 catch(IndexOutOfBoundsException e)
                 {
@@ -139,8 +139,10 @@ public class Main {
                     viewAllCustomers(true);
                     break;
                 case "2":
-                   Customer newCustomer = customerDisplay.createNewCustomer();
+                   Customer newCustomer = consoleCustomerDisplay.createNewCustomer();
                    customerSerializer.saveCustomer(newCustomer, "customers.ser");
+                   
+                   System.out.println("New customer added: " + newCustomer.getFullname());
                     break;
 
                     case "3":
@@ -164,12 +166,28 @@ public class Main {
             
             switch (choice) {
                 case "1":
-                    employeeDisplay.displayEmployeeList(employeeSerializer.loadEmployeeList());
+                    String responseString=serverCom.sendCommandAndGetResponse("ListEmployees");
+                    
+                    
+                    System.out.println("Response from server: " + responseString);
+
+                    if (responseString.equals("SUCCESS")) {
+                        System.out.println("Receiving employee data from server...");
+                        employeeDisplay.displayEmployeeList(employeeSerializer.loadEmployeeListFromText());
+
+                    } else {
+                        System.err.println("Failed to receive employee data.");
+                        break;
+                    }
+
+                    menuDisplay.promptToContinue();
+
                     break;
                 case "2":
                     Employee newEmployee = employeeDisplay.createNewEmployee();
                     System.err.println("Created new employee: " + newEmployee.toString());
-                    serverCom.sendCommand("AddEmployee " + util.TypeConverter.employeeToString(newEmployee) + "\n");
+                    serverCom.sendCommandAndGetResponse("AddEmployee " + util.TypeConverter.employeeToString(newEmployee) + "\n");
+                    serverCom.emptyBuffer();
                 
                     break;
                 case "3":
@@ -180,10 +198,6 @@ public class Main {
             }
         }
     }
-
-    
-
-    
 
     
 
