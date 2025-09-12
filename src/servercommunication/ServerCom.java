@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import model.Branch;
 import util.Constants;
 
 public class ServerCom
@@ -12,30 +13,34 @@ public class ServerCom
 private Socket socket;
 public BufferedReader reader;
 private PrintWriter writer;
+private Branch associatedBranch;//automatic branch recognition according to client config
 private static ServerCom instance;
 
-    public ServerCom() 
+
+
+    public ServerCom(Branch associatedBranch) 
     {
         if (instance != null) {
             throw new IllegalStateException("ServerCom instance already exists. Use getInstance() to access it.");
         }
         instance = this;
+        this.associatedBranch = associatedBranch;
     }
 
-public static ServerCom getInstance() {
-    return instance;
-    }
+    public static ServerCom getInstance() {
+        return instance;
+        }
 
-public Socket getSocket(){
-    return this.socket;
-    }
- 
+    public Socket getSocket(){
+        return this.socket;
+        }
+    
 
-public void ServerConnection() throws IOException {
-        socket = new Socket(Constants.HOST, Constants.PORT);
-        reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        writer = new PrintWriter(socket.getOutputStream(), true);
-    }
+    public void ServerConnection() throws IOException {
+            socket = new Socket(Constants.HOST, Constants.PORT);
+            reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            writer = new PrintWriter(socket.getOutputStream(), true);
+        }
 
     public String sendCommandAndGetResponse(String command, boolean verbose) throws IOException 
     {
@@ -64,5 +69,10 @@ public void ServerConnection() throws IOException {
         socket.close();
     }
     
+    public void revealBranchToServer() throws IOException {
+        String branchInfo = associatedBranch.getName() + " " + associatedBranch.getId();
+        writer.println(branchInfo);
+        writer.flush();
+        }
 
 }

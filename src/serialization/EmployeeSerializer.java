@@ -57,7 +57,7 @@ public class EmployeeSerializer {
 
             List<Employee> employees = new ArrayList<Employee>();
             while ((employeeListRawText = reader.readLine()) != null && !employeeListRawText.isEmpty()) {
-                Employee employee = util.TypeConverter.StringToEmployee(employeeListRawText);
+                Employee employee = util.TypeConverter.stringToEmployee(employeeListRawText);
                 employees.add(employee);
             }
             return employees;

@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
+import model.Branch;
 import model.Employee;
 import model.customer.Customer;
 import serialization.CustomerSerializer;
@@ -16,8 +17,9 @@ import view.ConsoleMenuDisplay;
 public class Main {
     private static Scanner scanner = new Scanner(System.in);
     private static ConsoleCustomerDisplay consoleCustomerDisplay = new ConsoleCustomerDisplay();
-
-    private static ServerCom serverCom = new ServerCom();
+    private static Branch associatedBranch = new Branch();//automatic branch recognition according to client config
+    
+    private static ServerCom serverCom = new ServerCom(associatedBranch);
     private static CustomerSerializer customerSerializer = new CustomerSerializer(serverCom);
     private static EmployeeSerializer employeeSerializer = null;
     private static Login login = new Login(serverCom);
@@ -33,12 +35,16 @@ public class Main {
     
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         try {
+            System.err.println("Connecting to server as branch: " + associatedBranch.getName() + " (ID: " + associatedBranch.getId() + ")");
             serverCom.ServerConnection();
 
-             employeeSerializer = new EmployeeSerializer(serverCom);
+            employeeSerializer = new EmployeeSerializer(serverCom);
             String serverMessage=serverCom.reader.readLine();
             System.out.println("Message from server: " + serverMessage);
-            
+            if (serverMessage.equals("YOU ARE NOW CONNECTED")) {
+                serverCom.revealBranchToServer();
+                associatedBranch.setConnected(true);
+            }
 
         } catch (IOException e) {
             System.err.println("Error connecting to server: " + e.getMessage());

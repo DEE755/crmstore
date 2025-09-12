@@ -21,7 +21,7 @@ public class ConsoleEmployeeDisplay  {
     public void displayEmployeeList(List<Employee> employees) {
         System.out.println("=== EMPLOYEE LIST ===");
         for (Employee employee : employees) {
-            System.out.println("ID: " + employee.getId() + ", Name: " + employee.getName());
+            System.out.println("ID: " + employee.getId() + " Name: " + employee.getName() + " Username: " + employee.getUsername() + " Email: " + employee.getEmail() + " Phone: " + employee.getPhoneNumber());
         }
         System.out.println("=======================");
     }
@@ -31,23 +31,50 @@ public class ConsoleEmployeeDisplay  {
 
 
 
-    public Employee createNewEmployee()
-    {
-        Scanner scanner = new Scanner(System.in);
+    public Employee createNewEmployee() {
+        String name;
+        String email;
+        String phoneNumber;
+        String username;
+        String password;
+
         System.out.println("Enter employee name:");
-        String name = scanner.nextLine();
-        System.out.println("Enter employee email:");
-        String email = scanner.nextLine();
-        System.out.println("Enter employee phone number:");
-        String phoneNumber = scanner.nextLine();
-        System.out.println("Enter employee username:");
-        String username = scanner.nextLine();
-        System.out.println("Enter employee password:");
-        String password = scanner.nextLine();
-        
+        name = scanner.nextLine().replace(" ", "-");
+
+        do {
+            System.out.println("Enter employee email:");
+            email = scanner.nextLine();
+            if (email.isEmpty() || !email.contains("@")) {
+                System.out.println("Invalid email. Please try again.");
+            }
+        } while (email.isEmpty() || !email.contains("@"));
+
+        do {
+            System.out.println("Enter employee phone number:");
+            phoneNumber = scanner.nextLine();
+            if (phoneNumber.isEmpty() || !phoneNumber.matches("\\d+") || phoneNumber.length() < 7) {
+                System.out.println("Invalid phone number. Please try again.");
+            }
+        } while (phoneNumber.isEmpty() || !phoneNumber.matches("\\d+") || phoneNumber.length() < 7);
+
+        do {
+            System.out.println("Enter employee username:");
+            username = scanner.nextLine();
+            if (username.isEmpty() || username.contains(" ")) {
+                System.out.println("Invalid username. Please try again.");
+            }
+        } while (username.isEmpty() || username.contains(" "));
+
+        do {
+            System.out.println("Enter employee password:");
+            password = scanner.nextLine();
+            if (password.isEmpty() || password.contains(" ")) {
+                System.out.println("Invalid password. Please try again.");
+            }
+        } while (password.isEmpty() || password.contains(" "));
+
         Employee newEmployee = new Employee(name, email, username, password, phoneNumber);
         return newEmployee;
-        
     }
 
 }

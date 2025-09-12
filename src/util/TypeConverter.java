@@ -37,14 +37,14 @@ public static JSONObject employeeToJSON(Employee employee) {
 public static String employeeToString(Employee employee) {
     String employeeString = employee.getId() + " " +
                             employee.getName() + " " +
-                            employee.getUsername() + " " +
-                            employee.getPassword() + " " +
+                             employee.getPassword() + " " +
                             employee.getEmail() + " " +
+                            employee.getUsername() + " " +
                             employee.getPhoneNumber();
     return employeeString;  
 }
 
-public static Employee StringToEmployee(String employeeString) {
+public static Employee stringToEmployee(String employeeString) {
     String[] parts = employeeString.split(" ");
     if (parts.length != 1 && parts.length != 6) {
         throw new IllegalArgumentException("Invalid employee string: " + employeeString);
@@ -52,11 +52,11 @@ public static Employee StringToEmployee(String employeeString) {
     System.err.println("Parts length: " + parts.length);
     int id = Integer.parseInt(parts[0]);
     String name = parts[1];
-    String username = parts[2];
-    String password = parts[3];
-    String email = parts[4];
+    String password = parts[2];
+    String email = parts[3];
+    String username = parts[4];
     String phoneNumber = parts[5];
-    return new Employee(id, name, username, password, email, phoneNumber);
+    return new Employee(id, name, email, username, password, phoneNumber);
 
 }
 
