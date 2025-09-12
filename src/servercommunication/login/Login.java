@@ -4,7 +4,6 @@ import java.util.Optional;
 import java.util.Scanner;
 import model.Employee;
 import servercommunication.ServerCom;
-import util.JSONObject;
 
 
 public class Login implements LoginInterface {
@@ -50,13 +49,20 @@ public class Login implements LoginInterface {
             }
             
 
-            //CONVERT THE JSON RAW TEXT TO EMPLOYEE OBJECT
-            JSONObject json = new JSONObject(employeeInfo);
-            Employee employee = util.TypeConverter.JSONToEmployee(json);
+            //CONVERT THE JSON RAW TEXT TO EMPLOYEE OBJECT TODO(CONSIDER REPLACE WITH STRING PARSER THAT EXISTS ALREADY BUT NEED TO MATCH SERVER)
+            
+           
+        
+            
+            //JSONObject json = new JSONObject(employeeInfo);
+            //Employee employee = util.TypeConverter.JSONToEmployee(json);
+
+            Employee employee = util.TypeConverter.stringToEmployee(employeeInfo);
 
             if (employee != null) {
                 loggedIn = true;
-                System.out.println("Logged in as: " + employee.getName());
+                
+                System.out.println(util.Utility.decorationLines("Logged in as: " + employee.getFirstName() + " " + employee.getFamilyName() + "\nRole: " + employee.getRole() + "\nFrom BRANCH: " + employee.getBranch().getName() + " BRANCH ID: " + employee.getBranch().getId()));
                 return Optional.of(employee);
             }
 

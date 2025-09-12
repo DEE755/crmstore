@@ -4,15 +4,21 @@ public class Branch {
     private String name;
     private int id;
     private boolean isConnected;
+    private static final Branch clientBranch = new Branch(util.Constants.BRANCH_NAME);
    // private static List<Socket> branchClients;
 
 
     public Branch() {
         this.name = util.Constants.BRANCH_NAME;
-        this.id = generateIdFromName(name);
+        this.id = hashIdFromName(name);
         this.isConnected = false;
 
         System.err.println("Generating new Branch from config file: Name: " + name + ", ID: " + id);
+    }
+    public Branch(String name) {
+        this.name = name;
+        this.id = hashIdFromName(name);
+        this.isConnected = false;
     }
 
     public Branch(String name, int id, boolean isConnected) {
@@ -21,6 +27,10 @@ public class Branch {
         this.isConnected = isConnected;
     }
 
+
+    public static Branch getClientBranch() {
+        return clientBranch;
+    }
     public String getName() {
         return name;
     }
@@ -37,7 +47,7 @@ public class Branch {
         return id;
     }
 
-    public static int generateIdFromName(String name) {
+    public static int hashIdFromName(String name) {   
     return Math.abs(name.hashCode());
 }
 

@@ -44,4 +44,15 @@ private static CustomerSerializer customerSerializer = new CustomerSerializer(se
 
         return 1; 
     }
+
+
+    public static String decorationLines(String text) {
+        StringBuilder decorated = new StringBuilder();
+        String line = "=".repeat(text.length() + 4);
+        decorated.append("\n").append(line).append("\n");
+        decorated.append(text).append("\n");
+        decorated.append(line).append("\n");
+        return decorated.toString();
+    }
+    
 }

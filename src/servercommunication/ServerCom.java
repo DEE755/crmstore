@@ -18,13 +18,13 @@ private static ServerCom instance;
 
 
 
-    public ServerCom(Branch associatedBranch) 
+    public ServerCom() 
     {
         if (instance != null) {
             throw new IllegalStateException("ServerCom instance already exists. Use getInstance() to access it.");
         }
         instance = this;
-        this.associatedBranch = associatedBranch;
+        this.associatedBranch = Branch.getClientBranch();
     }
 
     public static ServerCom getInstance() {

@@ -19,7 +19,7 @@ public class Main {
     private static ConsoleCustomerDisplay consoleCustomerDisplay = new ConsoleCustomerDisplay();
     private static Branch associatedBranch = new Branch();//automatic branch recognition according to client config
     
-    private static ServerCom serverCom = new ServerCom(associatedBranch);
+    private static ServerCom serverCom = new ServerCom();
     private static CustomerSerializer customerSerializer = new CustomerSerializer(serverCom);
     private static EmployeeSerializer employeeSerializer = null;
     private static Login login = new Login(serverCom);
@@ -184,7 +184,7 @@ public class Main {
                     serverCom.emptyBuffer();
 
                    if (responseString.equals("SUCCESS")) {
-                       System.out.println("New customer added: " + newCustomer.getFirstName());
+                       System.out.println("ed: " + newCustomer.getFirstName());
                    } else {
                        System.err.println("Failed to add new customer.");
                    }

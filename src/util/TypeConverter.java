@@ -1,5 +1,6 @@
 package util;
 
+import model.Branch;
 import model.Employee;
 import model.customer.Customer;
 import model.customer.NewCustomer;
@@ -8,57 +9,40 @@ import model.customer.VIPCustomer;
 
 public class TypeConverter {
 
-    public static Employee JSONToEmployee(JSONObject json) {
-    Employee employee = new Employee(
-        json.getInt("id"),
-        json.getString("name"),
-        json.getString("username"),
-        json.getString("password"),
-        json.getString("email"),
-        json.getString("phoneNumber")
-    );
-
-    return employee;
-    }
-
-
-public static JSONObject employeeToJSON(Employee employee) {
-    JSONObject json = new JSONObject();
-    json.put("id", employee.getId());
-    json.put("name", employee.getName());
-    json.put("username", employee.getUsername());
-    json.put("password", employee.getPassword());
-    json.put("email", employee.getEmail());
-    json.put("phoneNumber", employee.getPhoneNumber());
-    return json;
-}
-
 
 public static String employeeToString(Employee employee) {
     String employeeString = employee.getId() + " " +
-                            employee.getName() + " " +
-                             employee.getPassword() + " " +
+                            employee.getFirstName() + " " +
+                            employee.getFamilyName() + " " +
+                            employee.getPassword() + " " +
                             employee.getEmail() + " " +
                             employee.getUsername() + " " +
-                            employee.getPhoneNumber();
-    return employeeString;  
+                            employee.getPhoneNumber() + " " +
+                            employee.getRole().name() + " " +
+                            employee.getBranch().getName();
+
+    return employeeString;
 }
 
 public static Employee stringToEmployee(String employeeString) {
     String[] parts = employeeString.split(" ");
-    if (parts.length != 1 && parts.length != 6) {
-        throw new IllegalArgumentException("Invalid employee string: " + employeeString);
+    if (parts.length != 1 && parts.length != 9) {
+        throw new IllegalArgumentException("Invalid employeekkk string: " + employeeString);
     }
-    System.err.println("Parts length: " + parts.length);
+    //System.err.println("Parts length: " + parts.length);
     int id = Integer.parseInt(parts[0]);
-    String name = parts[1];
-    String password = parts[2];
-    String email = parts[3];
-    String username = parts[4];
-    String phoneNumber = parts[5];
-    return new Employee(id, name, email, username, password, phoneNumber);
+    String firstName = parts[1];
+    String familyName = parts[2];
+    String password = parts[3];
+    String email = parts[4];
+    String username = parts[5];
+    String phoneNumber = parts[6];
+    Employee.Role role = Employee.Role.valueOf(parts[7]);
+    Branch branch = new Branch(parts[8]);
+    return new Employee(id, firstName, familyName, email, username, password, phoneNumber, role, branch);
+    }
 
-}
+
 
 
 public static Customer stringToCustomer(String customerInfoString) {
@@ -67,7 +51,7 @@ public static Customer stringToCustomer(String customerInfoString) {
     if (parts.length != 1 && parts.length != 7) {
         throw new IllegalArgumentException("Invalid customer string: " + customerInfoString);
     }
-    System.err.println("Parts length: " + parts.length);
+    //System.err.println("Parts length: " + parts.length);
     int id = Integer.parseInt(parts[0]);
     String firstName = parts[1];
     String familyName = parts[2];
