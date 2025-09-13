@@ -1,17 +1,27 @@
 package view;
 
-import java.util.Scanner;
-
-public class ConsoleMenuDisplay 
+public class ConsoleMenuDisplay extends GeneralDisplay
 {
-    private Scanner scanner = new Scanner(System.in);
+    
+
+    private static ConsoleMenuDisplay instance;
+
+    public static ConsoleMenuDisplay getInstance() {
+        if (instance == null){
+            instance = new ConsoleMenuDisplay();
+        }
+        return instance;
+    }
+
+    private ConsoleMenuDisplay() {}
 
     public String displayMainMenu() {
         System.out.println("\n=== MAIN MENU ===");
         System.out.println("1. Customer Management");
         System.out.println("2. Employee Management");
-        System.out.println("3. Logout");
-        System.out.print("Choose option (1-3): ");
+        System.out.println("3. Inventory Management");
+        System.out.println("4. Logout");
+        System.out.print("Choose option (1-4): ");
         return scanner.nextLine();
     }
 
@@ -31,14 +41,26 @@ public class ConsoleMenuDisplay
         System.out.println("\n=== EMPLOYEE MANAGEMENT ===");
         System.out.println("1. View All Employees");
         System.out.println("2. Add New Employee");
-        System.out.println("3. Back to Main Menu");
-        System.out.print("Choose option (1-3): ");
+        System.out.println("3. Delete an Employee");
+        System.out.println("4. Back to Main Menu");
+        System.out.print("Choose option (1-4): ");
         return scanner.nextLine();
     }
+
+    public String displayInventoryManagementMenu() {
+        System.out.println("\n=== INVENTORY MANAGEMENT ===");
+        System.out.println("1. View Inventory");
+        System.out.println("2. Add New Product");
+        System.out.println("3. Update Product Quantity");
+        System.out.println("4. Delete Product");
+        System.out.println("5. Back to Main Menu");
+        System.out.print("Choose option (1-5): ");
+        return scanner.nextLine();
+    }
+
     public void promptToContinue()
     {
         System.out.println("\nPress Enter to continue...\n");
         scanner.nextLine();
-    
     }
 }

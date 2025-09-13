@@ -1,13 +1,26 @@
 package view;
 
+import java.io.IOException;
 import java.util.List;
-import java.util.Scanner;
 import model.Branch;
 import model.Employee;
 import model.Employee.Role;
+import servercommunication.ServerCom;
 
-public class ConsoleEmployeeDisplay  {
-    private Scanner scanner = new Scanner(System.in);
+public class ConsoleEmployeeDisplay extends GeneralDisplay { 
+
+    private static ConsoleEmployeeDisplay instance;
+    private static ServerCom serverCom=ServerCom.getInstance();
+    private static ConsoleMenuDisplay consoleMenuDisplay=ConsoleMenuDisplay.getInstance();
+
+    public static ConsoleEmployeeDisplay getInstance() {
+        if (instance == null){
+            instance = new ConsoleEmployeeDisplay();
+        }
+        return instance;
+    }
+
+    private ConsoleEmployeeDisplay() {}
 
 
     public void displayEmployeeDetails(Employee employee) {
@@ -16,6 +29,8 @@ public class ConsoleEmployeeDisplay  {
         System.out.println("First Name: " + employee.getFirstName());
         System.out.println("Family Name: " + employee.getFamilyName());
         System.out.println("Role: " + employee.getRole());
+        System.out.println("Branch: " + employee.getBranch().getName());
+        System.out.println("Username: " + employee.getUsername());
         System.out.println("Email: " + employee.getEmail());
         System.out.println("Phone: " + employee.getPhoneNumber());
         System.out.println("=======================");
@@ -25,13 +40,69 @@ public class ConsoleEmployeeDisplay  {
     public void displayEmployeeList(List<Employee> employees) {
         System.out.println("=== EMPLOYEE LIST ===");
         for (Employee employee : employees) {
-            System.out.println("ID: " + employee.getId() + " Name: " + employee.getFirstName() + " " + employee.getFamilyName() + " Role: " + employee.getRole() + " Username: " + employee.getUsername() + " Email: " + employee.getEmail() + " Phone: " + employee.getPhoneNumber()+ " Branch: " + employee.getBranch().getName());
+            System.out.println("ID: " + employee.getId() + " Name: " + employee.getFirstName() + " " + employee.getFamilyName() + " Role: " + employee.getRole() +" Branch: " + employee.getBranch().getName());
         }
         System.out.println("=======================");
     }
 
 
-   
+    public void viewAllEmployees(Mode mode, List<Employee> employees) throws IOException, ClassNotFoundException {
+        System.out.println("\n=== ALL EMPLOYEES ===");
+        
+        displayEmployeeList(employees);
+
+        if (mode == Mode.VIEW) {
+            System.out.println("\nWrite the ID of the Employee you want to see and press Enter to continue... Or cancel by pressing Enter without typing anything.");
+        }
+        else {System.out.println("\nWrite the ID of the Employee you want to delete and press Enter to continue... Or cancel by pressing Enter without typing anything.");}
+        String input = scanner.nextLine();
+        
+        
+        if (!input.trim().isEmpty()) {
+            try {
+                int employeeId = Integer.parseInt(input);
+
+                try{
+                    if (mode == Mode.DELETE)
+                    {
+                    displayEmployeeDetails(employees.get(Employee.findEmployeeIndexById(employees, employeeId)));
+
+                    }
+                    else{
+                        String responseString=serverCom.sendCommandAndGetResponse("ListEmployees DELETEMODE " + employeeId + "\n", util.Constants.VERBOSE_OVERRIDE);
+
+
+                        if (responseString.equals("SUCCESS")) {
+                            System.out.println("Employee with ID " + employeeId + " has been deleted successfully.");
+                        } else
+                        {
+                            System.err.println("Failed to delete employee with ID " + employeeId + ". Please ensure the ID is correct.");
+                        }
+                    
+                    }
+                    
+                }
+                catch(IndexOutOfBoundsException e)
+                {
+                    System.out.println("No customer found with the given ID.");
+                    
+                }
+
+                
+
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid ID format.");
+            }
+            finally {
+                consoleMenuDisplay.promptToContinue();
+            }
+
+        }  
+
+
+    }
+
+
 
 
 
@@ -114,6 +185,9 @@ public class ConsoleEmployeeDisplay  {
         Employee newEmployee = new Employee(firstName, familyName, email, username, password, phoneNumber, role, Branch.getClientBranch());
         return newEmployee;
     }
+
+
+    
 
 }
 

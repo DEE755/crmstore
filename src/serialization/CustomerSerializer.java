@@ -12,12 +12,20 @@ import model.customer.Customer;
 import servercommunication.ServerCom;
 
 public class CustomerSerializer {
-    ServerCom serverCom;
-    Socket socket;
+    ServerCom serverCom=ServerCom.getInstance();
+    Socket socket=serverCom.getSocket();
 
-    public CustomerSerializer(ServerCom serverCom) {
-        this.serverCom = serverCom;
-        this.socket = serverCom.getSocket();
+    private static CustomerSerializer instance;
+
+    public static CustomerSerializer getInstance() {
+        if (instance == null) {
+            instance = new CustomerSerializer();
+        }
+        return instance;
+    }
+
+    private CustomerSerializer() {
+        
     }
 
 

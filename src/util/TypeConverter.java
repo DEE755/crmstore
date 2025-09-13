@@ -6,9 +6,11 @@ import model.customer.Customer;
 import model.customer.NewCustomer;
 import model.customer.ReturningCustomer;
 import model.customer.VIPCustomer;
+import model.inventory.StockItem;
 
 public class TypeConverter {
 
+    //EMPLOYEES <-> STRING TYPECONVERTERS
 
 public static String employeeToString(Employee employee) {
     String employeeString = employee.getId() + " " +
@@ -43,7 +45,7 @@ public static Employee stringToEmployee(String employeeString) {
     }
 
 
-
+//CUSTOMERS <-> STRING TYPECONVERTERS
 
 public static Customer stringToCustomer(String customerInfoString) {
     Customer newCustomer=null;
@@ -87,5 +89,34 @@ public static String customerToString(Customer customer) {
     return customerString;
 }
 
+
+//ITEMS <-> STRING TYPECONVERTERS
+
+public static String stockItemToString(StockItem item) {
+    String itemString = 
+                        item.getName() + " " +
+                        item.getQuantity() + " " +
+                        item.getPrice() + " " +
+                        item.getId() + " " +
+                        item.getCategory().name();
+    return itemString;
+}
+
+
+
+
+public static StockItem stringToStockItem(String itemString) {
+    String[] parts = itemString.split(" ");
+    if (parts.length != 5) {
+        throw new IllegalArgumentException("Invalid item string: " + itemString);
+    }
+    String name = parts[0];
+    int quantity = Integer.parseInt(parts[1]);
+    double price = Double.parseDouble(parts[2]);
+    int id = Integer.parseInt(parts[3]);
+    StockItem.Category category = StockItem.Category.valueOf(parts[4]);
+
+    return new StockItem(name, id, quantity, price, category);
+}
 
 }

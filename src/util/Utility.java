@@ -2,6 +2,7 @@ package util;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Scanner;
 import model.customer.Customer;
 import serialization.CustomerSerializer;
 import servercommunication.ServerCom;
@@ -13,11 +14,12 @@ public final class Utility {
 
     //get a reference to the singleton ServerCom instance
 private static ServerCom serverCom = ServerCom.getInstance();
+private static Scanner scanner = new Scanner(System.in);
 
 
 
 
-private static CustomerSerializer customerSerializer = new CustomerSerializer(serverCom);
+private static CustomerSerializer customerSerializer = CustomerSerializer.getInstance();
 //private static EmployeeSerializer employeeSerializer = new EmployeeSerializer();
 
     public static int calculateLastId() {
@@ -54,5 +56,15 @@ private static CustomerSerializer customerSerializer = new CustomerSerializer(se
         decorated.append(line).append("\n");
         return decorated.toString();
     }
-    
+
+
+    public static int promptAnInt(String message) {
+        System.out.print(message);
+        while (!scanner.hasNextInt()) {
+            System.out.print("Invalid input. " + message);
+            scanner.next(); 
+        }
+        return scanner.nextInt();
+    }
+
 }

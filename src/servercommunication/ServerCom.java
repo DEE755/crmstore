@@ -13,23 +13,23 @@ public class ServerCom
 private Socket socket;
 public BufferedReader reader;
 private PrintWriter writer;
-private Branch associatedBranch;//automatic branch recognition according to client config
+private static Branch associatedBranch;//automatic branch recognition according to client config
 private static ServerCom instance;
 
 
 
-    public ServerCom() 
-    {
-        if (instance != null) {
-            throw new IllegalStateException("ServerCom instance already exists. Use getInstance() to access it.");
-        }
-        instance = this;
-        this.associatedBranch = Branch.getClientBranch();
-    }
+    private ServerCom() {}
 
     public static ServerCom getInstance() {
+        if (instance == null) 
+        instance=new ServerCom();
+        
+        else associatedBranch = Branch.getClientBranch();
+         
         return instance;
         }
+
+        
 
     public Socket getSocket(){
         return this.socket;

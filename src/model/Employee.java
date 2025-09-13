@@ -1,4 +1,7 @@
 package model;
+
+import java.util.List;
+
 public class Employee implements java.io.Serializable {
     private String firstName;
     private String familyName;
@@ -85,6 +88,15 @@ public class Employee implements java.io.Serializable {
 
     public Branch getBranch() {
         return branch;
+    }
+
+    public static int findEmployeeIndexById(List<Employee> employees, int searchId) {
+        for (int i = 0; i < employees.size(); i++) {
+            if (employees.get(i).getId() == searchId) {
+                return i;
+            }
+        }
+        return -1;
     }
 
 }

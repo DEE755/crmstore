@@ -14,12 +14,20 @@ import servercommunication.ServerCom;
 import util.*;
 
 public class EmployeeSerializer {
-    ServerCom serverCom;
-    Socket socket;
+    ServerCom serverCom = ServerCom.getInstance();
+    Socket socket=serverCom.getSocket();
 
-    public EmployeeSerializer(ServerCom serverCom) {
-        this.serverCom = serverCom;
-        this.socket = serverCom.getSocket();
+    private static EmployeeSerializer instance;
+    public static EmployeeSerializer getInstance() {
+        if (instance == null) {
+            instance = new EmployeeSerializer();
+        }
+        return instance;
+    }
+
+    private EmployeeSerializer() {
+        
+        
     }
     
     
