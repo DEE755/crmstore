@@ -4,17 +4,13 @@ import java.io.Serial;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import model.Participant;
 import util.Utility;
 
-public abstract class Customer implements java.io.Serializable {
+public abstract class Customer extends Participant implements java.io.Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     
-    private String firstName;
-    private String familyName;
-    private String email;
-    private int id;
-    private String phoneNumber;
     private double discount;
 
     private static int idCounter = 0;
@@ -35,52 +31,21 @@ public abstract class Customer implements java.io.Serializable {
     //those constuctors can be only used as super from subclasses (abstract class)
     //creating a totally new customer
     public Customer(String firstName, String familyName, String email, String phoneNumber, double discount) {
-        this.firstName = firstName;
-        this.familyName = familyName;
-        this.email = email;
-        this.id = Utility.calculateLastId();
-        this.phoneNumber = phoneNumber;
+        super(firstName, familyName, email, Utility.calculateLastId(), phoneNumber);
         this.discount = discount;
     }
 
     //creating a customer from already existing 
-     public Customer(int givenId, String firstName, String familyName, String email, String phoneNumber, double discount) {
-        this.firstName = firstName;
-        this.familyName = familyName;
-        this.email = email;
-        this.id = givenId;
-        this.phoneNumber = phoneNumber;
+    public Customer(int givenId, String firstName, String familyName, String email, String phoneNumber, double discount) {
+        super(firstName, familyName, email, givenId, phoneNumber);
         this.discount = discount;
     }
-
-    public String getEmail() {
-        return this.email;
-    }
-
-    public String getPhoneNumber() {
-        return this.phoneNumber;
-    }
-
 
     public double getDiscount() {
         return discount;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getFamilyName() {
-        return familyName;
-    }
-    public String getFullName() {
-    return firstName + " " + familyName;
-}
-
+    
     public double calculatePrice(double basePrice) {
         return basePrice * (1 - discount);
     }

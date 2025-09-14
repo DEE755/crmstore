@@ -13,6 +13,7 @@ import serialization.StockItemSerializer;
 import servercommunication.Commands;
 import servercommunication.ServerCom;
 import servercommunication.login.Login;
+import view.ConsoleChat;
 import view.ConsoleCustomerDisplay;
 import view.ConsoleEmployeeDisplay;
 import view.ConsoleInventoryDisplay;
@@ -27,7 +28,7 @@ public class Main {
     private static ConsoleInventoryDisplay consoleInventoryDisplay = ConsoleInventoryDisplay.getInstance();
     private static Commands commands = Commands.getInstance();
 
-    private static Branch associatedBranch = new Branch();//automatic branch recognition according to client config
+    public static Branch associatedBranch = new Branch();//automatic branch recognition according to client config
     
     private static ServerCom serverCom = ServerCom.getInstance();
 
@@ -72,8 +73,8 @@ public class Main {
             //System.out.println(currentEmployee);
             if(currentEmployee.isPresent())
             {
-                associatedBranch.setCurrentEmployee(currentEmployee.get());
-                System.out.println("Login successful. Welcome, " + associatedBranch.getCurrentEmployee().getFirstName() + " " + associatedBranch.getCurrentEmployee().getFamilyName() + " (" + associatedBranch.getCurrentEmployee().getRole() + ") at " + associatedBranch.getName() + " branch.");
+                associatedBranch.setConnectedEmployee(currentEmployee.get());
+                System.out.println("Login successful. Welcome, " + associatedBranch.getConnectedEmployee().getFirstName() + " " + associatedBranch.getConnectedEmployee().getFamilyName() + " (" + associatedBranch.getConnectedEmployee().getRole() + ") at " + associatedBranch.getName() + " branch.");
             break;
             }
             else 
@@ -83,7 +84,7 @@ public class Main {
         while (login.isLoggedIn()) {
             String choice;
             Sale newSale;
-            if (associatedBranch.getCurrentEmployee().getRole() == Employee.Role.SELLER)
+            if (associatedBranch.getConnectedEmployee().getRole() == Employee.Role.SELLER)
             {
             choice = menuDisplay.displayMainMenuSeller();}
             else{
@@ -96,12 +97,12 @@ public class Main {
                     customerManagement();
                     break;
                 case "2":
-                if (associatedBranch.getCurrentEmployee().getRole() == Employee.Role.ADMIN)
+                if (associatedBranch.getConnectedEmployee().getRole() == Employee.Role.ADMIN)
                     employeeManagement();
                     else {
                     
                     try{
-                    newSale=Sale.createSale(associatedBranch.getCurrentEmployee());
+                    newSale=Sale.createSale(associatedBranch.getConnectedEmployee());
                     newSale.submitSaleToServer(serverCom, newSale);
                     }
                     catch(Exception e)
@@ -123,7 +124,7 @@ public class Main {
 
 
                 case "4":
-                    System.out.println("=== CHAT FEATURE COMING SOON ===");
+                    ConsoleChat.getInstance().chatManagement();
                     menuDisplay.promptToContinue();
                     break;
 
@@ -181,6 +182,8 @@ public class Main {
                     break;
 
                     case "3": //Delete customer
+
+                    serverCom.emptyBuffer();
 
                     responseString=serverCom.sendCommandAndGetResponse("ListCustomers", util.Constants.VERBOSE_OVERRIDE);
 
@@ -306,38 +309,74 @@ public class Main {
             break;
         }
 
-         case "3" -> {//Edit item quantity
+         case "3" -> {//Edit product
 
-                     try {
+            choice=menuDisplay.displayEditProductSubMenu();
+            try {
                  List<StockItem> items = commands.getItemListFromServer();
+               
+            if (choice.equals("1"))
+            {
+            
                  consoleInventoryDisplay.viewEditDeleAllItems(Mode.EDIT, items);
-             } catch (Exception e) {
-                 System.err.println("Error retrieving inventory: " + e.getMessage());
-             }
+             
                          menuDisplay.promptToContinue();
 
                     break;
         }
+        else if (choice.equals("2"))
+        {
+                     
+                 consoleInventoryDisplay.viewEditDeleAllItems(Mode.DELETE, items);
+            
+            
+             }
+                        
+            }catch (Exception e) {
+                 System.err.println("Error retrieving inventory: " + e.getMessage());
+             }
+
+                 menuDisplay.promptToContinue();
+
+                    break;
+        }
+        
+        
+
         case "4" -> {
 
                      try {
                  List<StockItem> items = commands.getItemListFromServer();
-                 consoleInventoryDisplay.viewEditDeleAllItems(Mode.DELETE, items);
-             } catch (Exception e) {
-                 System.err.println("Error retrieving inventory: " + e.getMessage());
-             }
-                            menuDisplay.promptToContinue();
-                    break;
+                 Optional<StockItem>selectedItem=consoleInventoryDisplay.viewEditDeleAllItems(Mode.SELECT, items);
+                    if (selectedItem.isPresent())
+                    {
+                        consoleInventoryDisplay.buyStockItem(selectedItem.get());
+                    }
+                    else
+                    {
+                        System.out.println("No item selected. Returning to inventory menu.");
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error retrieving inventory: " + e.getMessage());
+                }
+                menuDisplay.promptToContinue();
+                break;
         }
-
-        
+    
 
         case "5" -> {
              // Return to main menu
              return;
             }
+
          default -> System.out.println("Invalid option! Please try again.");
-     }
+     
+        }
+
+
+
+
+
     }
 
 }

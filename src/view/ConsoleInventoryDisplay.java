@@ -146,9 +146,8 @@ public StockItem createNewItem() {
     System.out.println("\n=== ADD NEW PRODUCT ===");
     
     System.out.print("Enter product name: ");
-    String name = scanner.nextLine().trim();
-    
-    
+    String name = scanner.nextLine().replace(" ", "-");
+
     System.out.print("Enter product price: ");
     double price = Double.parseDouble(scanner.nextLine().trim());
     
@@ -173,5 +172,24 @@ public StockItem createNewItem() {
     return newItem;
 
 }
+
+public void buyStockItem(StockItem stockItem) throws IOException {
+    String responseString;
+  System.out.print("Enter quantity to buy (restock): ");
+                        int quantityToBuy = Integer.parseInt(scanner.nextLine().trim());
+                        if (quantityToBuy <= 0) {
+                            System.err.println("Quantity must be a positive integer.");
+                        } else {
+                            responseString = serverCom.sendCommandAndGetResponse("BuyItem " + stockItem.getId() + " " + quantityToBuy + "\n", true);
+                            serverCom.emptyBuffer();
+                            if (responseString.equals("SUCCESS")) {
+                                System.out.println("Successfully bought " + quantityToBuy + " of " + stockItem.getName() + ".");
+                            } else {
+                                System.err.println("Failed to buy item. Server response: " + responseString);
+                            }
+                        }
+                    }
+                
+
 
 }

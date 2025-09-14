@@ -31,6 +31,13 @@ public class Branch {
         this.isConnected = isConnected;
     }
 
+    public Branch(String name, int id, boolean isConnected, Employee currentEmployee) {
+        this.name = name;
+        this.id = id;
+        this.isConnected = isConnected;
+        this.currentEmployee = currentEmployee;
+    }
+
 
     public static Branch getClientBranch() {
         return clientBranch;
@@ -55,13 +62,31 @@ public class Branch {
     return Math.abs(name.hashCode());
 }
 
-    public Employee getCurrentEmployee() {
+    public Employee getConnectedEmployee() {
         return currentEmployee;
     }
 
-    public void setCurrentEmployee(Employee employee) {
+    public void setConnectedEmployee(Employee employee) {
         this.currentEmployee = employee;
     }
 
     
+
+public Branch stringToBranch(String branchString) {
+   return util.TypeConverter.stringToBranch(branchString);
+
+}
+
+
+@Override
+public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(name).append(",")
+        .append(id).append(",")
+        .append(isConnected).append(",")
+        .append(currentEmployee).append(",");
+    return sb.toString();
+}
+
+
 }

@@ -29,7 +29,7 @@ public static String employeeToString(Employee employee) {
 public static Employee stringToEmployee(String employeeString) {
     String[] parts = employeeString.split(" ");
     if (parts.length != 1 && parts.length != 9) {
-        throw new IllegalArgumentException("Invalid employeekkk string: " + employeeString);
+        throw new IllegalArgumentException("Invalid employee string: " + employeeString);
     }
     //System.err.println("Parts length: " + parts.length);
     int id = Integer.parseInt(parts[0]);
@@ -119,4 +119,24 @@ public static StockItem stringToStockItem(String itemString) {
     return new StockItem(name, id, quantity, price, category);
 }
 
+
+
+//STRING <-> BRANCH TYPECONVERTER
+public static Branch stringToBranch(String branchString) {
+    System.err.println("Branch string to convert: " + branchString);
+ String[] parts = branchString.split(" ");
+    if (parts.length != 5) {
+        throw new IllegalArgumentException("Invalid branch string format");
+    }
+    String name = parts[0].trim();
+    int id = Integer.parseInt(parts[1].trim());
+    boolean isConnected = Boolean.parseBoolean(parts[2].trim());
+
+    //String employeePart = branchString.substring(parts[0].length() + parts[1].length() + parts[2].length() + 3); // Extract the employee part of the string
+
+
+    Employee currentEmployee = new Employee(parts[3], parts[4], "", "", "", "", Employee.Role.SELLER, new Branch(name)); // Temporary branch, will be replaced below
+    return new Branch(name, id, isConnected, currentEmployee);
 }
+   
+    }

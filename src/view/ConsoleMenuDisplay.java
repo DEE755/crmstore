@@ -65,8 +65,8 @@ public class ConsoleMenuDisplay extends GeneralDisplay
         System.out.println("\n=== INVENTORY MANAGEMENT ===");
         System.out.println("1. View Inventory");
         System.out.println("2. Add New Product");
-        System.out.println("3. Update Product Quantity");
-        System.out.println("4. Delete Product");
+        System.out.println("3. Edit Product ");
+        System.out.println("4. Buy Product (Restock)");
         System.out.println("5. Back to Main Menu");
         System.out.print("Choose option (1-5): ");
         return scanner.nextLine();
@@ -79,5 +79,17 @@ public class ConsoleMenuDisplay extends GeneralDisplay
     {
         System.out.println("\nPress Enter to continue...\n");
         scanner.nextLine();
+    }
+
+    public String displayEditProductSubMenu() {
+        String choice;
+        System.out.println("\n=== EDIT PRODUCT ===");
+        System.out.println("1. Edit Product Quantity");
+        System.out.println("2. Delete a Product");
+
+        do{ System.out.print("Choose option (1-2): ");
+            choice = scanner.nextLine();
+        }while(!choice.matches("[1-2]"));
+        return choice;
     }
 }
