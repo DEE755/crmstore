@@ -5,6 +5,10 @@ public class Branch {
     private int id;
     private boolean isConnected;
     private static final Branch clientBranch = new Branch(util.Constants.BRANCH_NAME);
+    private Employee currentEmployee;
+
+    
+
    // private static List<Socket> branchClients;
 
 
@@ -50,6 +54,14 @@ public class Branch {
     public static int hashIdFromName(String name) {   
     return Math.abs(name.hashCode());
 }
+
+    public Employee getCurrentEmployee() {
+        return currentEmployee;
+    }
+
+    public void setCurrentEmployee(Employee employee) {
+        this.currentEmployee = employee;
+    }
 
     
 }

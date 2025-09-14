@@ -2,15 +2,18 @@ package view;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import model.customer.Customer;
 import model.customer.NewCustomer;
+import serialization.CustomerSerializer;
 import servercommunication.ServerCom;
 
 public class ConsoleCustomerDisplay extends GeneralDisplay {
     
     private static ConsoleMenuDisplay consoleMenuDisplay=ConsoleMenuDisplay.getInstance();
     private static ServerCom serverCom=ServerCom.getInstance();
-    
+    private static CustomerSerializer customerSerializer=CustomerSerializer.getInstance();
+
     private static ConsoleCustomerDisplay instance;
 
     public static ConsoleCustomerDisplay getInstance() {
@@ -22,13 +25,17 @@ public class ConsoleCustomerDisplay extends GeneralDisplay {
 
     private ConsoleCustomerDisplay() {}
 
-    
-    public void viewAllCustomers(boolean viewOrDelete, List<Customer> customers) throws IOException, ClassNotFoundException {
+
+    public Optional<Customer> viewAllCustomers(Mode viewMode, List<Customer> customers) throws IOException  {
         System.out.println("\n=== ALL CUSTOMERS ===");
          
         displayCustomerList(customers);
 
-        if (viewOrDelete) {
+        if (viewMode == Mode.SELECT) {
+            System.out.println("\nWrite the ID of the Customer you want to sell to and press Enter to continue... Or cancel by pressing Enter without typing anything.");
+        }
+
+        else if (viewMode == Mode.VIEW) {
             System.out.println("\nWrite the ID of the Customer you want to see and press Enter to continue... Or cancel by pressing Enter without typing anything.");
         }
         else {System.out.println("\nWrite the ID of the Customer you want to delete and press Enter to continue... Or cancel by pressing Enter without typing anything.");}
@@ -36,44 +43,44 @@ public class ConsoleCustomerDisplay extends GeneralDisplay {
         
         
         if (!input.trim().isEmpty()) {
-            try {
-                int customerId = Integer.parseInt(input);
+    
+                try {
+                    int customerId = Integer.parseInt(input);
+                    try {
+                        if (viewMode != Mode.DELETE) {
+                            Customer selectedCustomer = customers.get(Customer.findCustomerIndexById(customers, customerId));
 
-                try{
-                    if (viewOrDelete)
-                    {
-                    displayCustomerDetails(customers.get(Customer.findCustomerIndexById(customers, customerId)));
-                
-                    }
-                    else{
-                        String responseString=serverCom.sendCommandAndGetResponse("ListCustomers DELETEMODE " + customerId + "\n", util.Constants.VERBOSE_OVERRIDE);
+                            if (viewMode == Mode.SELECT) {
+                                return Optional.of(selectedCustomer);
+                            }
 
+                            if (viewMode == Mode.VIEW) {
+                                displayCustomerDetails(selectedCustomer);
+                                return Optional.empty();
+                            }
+                        } else { // DELETE MODE
+                            String responseString = serverCom.sendCommandAndGetResponse("ListCustomers DELETEMODE " + customerId + "\n", util.Constants.VERBOSE_OVERRIDE);
 
-                        if (responseString.equals("SUCCESS")) {
-                            System.out.println("Customer with ID " + customerId + " has been deleted successfully.");
-                        } else 
-                        {
-                            System.err.println("Failed to delete customer with ID " + customerId + ". Please ensure the ID is correct.");
+                            if (responseString.equals("SUCCESS")) {
+                                System.out.println("Customer with ID " + customerId + " has been deleted successfully.");
+                            } else {
+                                System.err.println("Failed to delete customer with ID " + customerId + ". Please ensure the ID is correct.");
+                            }
                         }
+                    } catch (IndexOutOfBoundsException e) {
+                        System.out.println("No customer found with the given ID.");
+                    } finally {
+                        consoleMenuDisplay.promptToContinue();
                     }
                 }
-                catch(IndexOutOfBoundsException e)
-                {
-                    System.out.println("No customer found with the given ID.");
-                    
+                catch (NumberFormatException e) {
+                    System.out.println("Invalid ID format.");
                 }
-
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid ID format.");
-            }
-            finally {
-                consoleMenuDisplay.promptToContinue();
-            }
-
-        }
         
-
+            }
+                    return Optional.empty();
     }
+
     
     public void displayCustomerDetails(Customer customer) {
         System.out.println("=== CUSTOMER DETAILS ===");
@@ -138,7 +145,31 @@ public class ConsoleCustomerDisplay extends GeneralDisplay {
         Customer newCustomer = new NewCustomer(firstName, familyName, email, phoneNumber);
         return newCustomer;
     }
-    
+
+
+
+    public Optional<Customer> listCustomersFromServer(Mode viewMode) throws Exception {
+        String responseString;
+        responseString=serverCom.sendCommandAndGetResponse("ListCustomers", util.Constants.VERBOSE_OVERRIDE);
+
+            if (responseString.equals("SUCCESS")) {
+                System.out.println("Receiving customers data from server...");
+                List<Customer> customers = customerSerializer.loadCustomerListFromServerText();
+                System.out.println("Loaded " + customers.size() + " customers.");
+                Optional<Customer> selectedCustomer = viewAllCustomers(viewMode, customers);
+
+                if(selectedCustomer.isPresent())
+                {return selectedCustomer;}
+                
+            }
+                    
+            else if (responseString.equals("EMPTY")) {
+                System.err.println("No customer data in the server yet.");
+                throw new Exception("No customer data in the server yet.");
+            }
+
+            return Optional.empty();
+        }
 
 }
 

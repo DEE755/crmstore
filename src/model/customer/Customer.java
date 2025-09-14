@@ -77,6 +77,9 @@ public abstract class Customer implements java.io.Serializable {
     public String getFamilyName() {
         return familyName;
     }
+    public String getFullName() {
+    return firstName + " " + familyName;
+}
 
     public double calculatePrice(double basePrice) {
         return basePrice * (1 - discount);
@@ -90,4 +93,6 @@ public abstract class Customer implements java.io.Serializable {
         }
         return -1;
     }
+
+    
 }

@@ -16,9 +16,6 @@ public final class Utility {
 private static ServerCom serverCom = ServerCom.getInstance();
 private static Scanner scanner = new Scanner(System.in);
 
-
-
-
 private static CustomerSerializer customerSerializer = CustomerSerializer.getInstance();
 //private static EmployeeSerializer employeeSerializer = new EmployeeSerializer();
 

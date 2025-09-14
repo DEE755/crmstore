@@ -5,12 +5,12 @@ import java.util.List;
 import model.Branch;
 import model.Employee;
 import model.Employee.Role;
-import servercommunication.ServerCom;
+
 
 public class ConsoleEmployeeDisplay extends GeneralDisplay { 
 
     private static ConsoleEmployeeDisplay instance;
-    private static ServerCom serverCom=ServerCom.getInstance();
+   
     private static ConsoleMenuDisplay consoleMenuDisplay=ConsoleMenuDisplay.getInstance();
 
     public static ConsoleEmployeeDisplay getInstance() {

@@ -6,9 +6,11 @@ import model.Branch;
 import model.Employee;
 import model.customer.Customer;
 import model.inventory.StockItem;
+import model.sales.Sale;
 import serialization.CustomerSerializer;
 import serialization.EmployeeSerializer;
 import serialization.StockItemSerializer;
+import servercommunication.Commands;
 import servercommunication.ServerCom;
 import servercommunication.login.Login;
 import view.ConsoleCustomerDisplay;
@@ -23,6 +25,7 @@ public class Main {
     private static ConsoleEmployeeDisplay consoleEmployeeDisplay = ConsoleEmployeeDisplay.getInstance();
     private static ConsoleMenuDisplay menuDisplay = ConsoleMenuDisplay.getInstance();
     private static ConsoleInventoryDisplay consoleInventoryDisplay = ConsoleInventoryDisplay.getInstance();
+    private static Commands commands = Commands.getInstance();
 
     private static Branch associatedBranch = new Branch();//automatic branch recognition according to client config
     
@@ -41,7 +44,7 @@ public class Main {
     
     
     
-    public static void main(String[] args) throws IOException, ClassNotFoundException {
+    public static void main(String[] args) throws IOException, ClassNotFoundException, Exception {
         try {
             System.err.println("Connecting to server as branch: " + associatedBranch.getName() + " (ID: " + associatedBranch.getId() + ")");
             serverCom.ServerConnection();
@@ -51,6 +54,7 @@ public class Main {
             if (serverMessage.equals("YOU ARE NOW CONNECTED")) {
                 serverCom.revealBranchToServer();
                 associatedBranch.setConnected(true);
+            
             }
 
         } catch (IOException e) {
@@ -66,29 +70,64 @@ public class Main {
         {
             currentEmployee = login.authenticate();
             //System.out.println(currentEmployee);
-            if(currentEmployee.isPresent()) 
+            if(currentEmployee.isPresent())
+            {
+                associatedBranch.setCurrentEmployee(currentEmployee.get());
+                System.out.println("Login successful. Welcome, " + associatedBranch.getCurrentEmployee().getFirstName() + " " + associatedBranch.getCurrentEmployee().getFamilyName() + " (" + associatedBranch.getCurrentEmployee().getRole() + ") at " + associatedBranch.getName() + " branch.");
             break;
-            
+            }
             else 
             System.err.println("Login failed. Please try again.");
         }
         
         while (login.isLoggedIn()) {
-            String choice = menuDisplay.displayMainMenu();
+            String choice;
+            Sale newSale;
+            if (associatedBranch.getCurrentEmployee().getRole() == Employee.Role.SELLER)
+            {
+            choice = menuDisplay.displayMainMenuSeller();}
+            else{
+                choice = menuDisplay.displayMainMenu();
+            }
+            
             
             switch (choice) {
                 case "1":
                     customerManagement();
                     break;
                 case "2":
+                if (associatedBranch.getCurrentEmployee().getRole() == Employee.Role.ADMIN)
                     employeeManagement();
+                    else {
+                    
+                    try{
+                    newSale=Sale.createSale(associatedBranch.getCurrentEmployee());
+                    newSale.submitSaleToServer(serverCom, newSale);
+                    }
+                    catch(Exception e)
+                    {
+                        System.err.println("Error submitting sale: " + e.getMessage());
+                        break;
+                    }
+
+                    System.out.println("Sale submitted successfully. Total: " + newSale.getTotalPrice() + " for " + newSale.getQuantitySold() + " x " + newSale.getItemSold().getName() + " to customer " + newSale.getBuyer().getFirstName() + " " + newSale.getBuyer().getFamilyName());
+                    menuDisplay.promptToContinue();
+                    }
+
+
                     break;
 
                 case "3":
                     inventoryManagement();
                     break;
 
+
                 case "4":
+                    System.out.println("=== CHAT FEATURE COMING SOON ===");
+                    menuDisplay.promptToContinue();
+                    break;
+
+                case "5":
                     System.out.println("Logging out...");
                     login.logout();
                     break;
@@ -101,6 +140,10 @@ public class Main {
 
     
 
+    
+
+
+
     private static void customerManagement() throws IOException, ClassNotFoundException {
         boolean inCustomerMenu = true;
         
@@ -111,21 +154,13 @@ public class Main {
             switch (choice) {
                 
                 case "1"://View all customers
-                 responseString=serverCom.sendCommandAndGetResponse("ListCustomers", util.Constants.VERBOSE_OVERRIDE);
-
-                    if (responseString.equals("SUCCESS")) {
-                        System.out.println("Receiving customers data from server...");
-                        List<Customer> customers = customerSerializer.loadCustomerListFromServerText();
-                        System.out.println("Loaded " + customers.size() + " customers.");
-                         consoleCustomerDisplay.viewAllCustomers(true, customers);   
-
-                    } 
-
-                    else if (responseString.equals("EMPTY")) {
-                        System.err.println("No customer data in the server yet.");
-        
-                    }
-
+                 
+                try {
+                    consoleCustomerDisplay.listCustomersFromServer(Mode.VIEW);
+                 } catch (Exception e) {
+                    System.err.println("Error: " + e.getMessage());
+                 }
+                    
                     break;
 
                 case "2"://Add new customer
@@ -151,14 +186,14 @@ public class Main {
 
                     System.out.println("Response from server: " + responseString);
 
-                    if (responseString.equals("SUCCESS")) {
+                    if (responseString.equals("SUCCESS")) 
+                    {
                         System.out.println("Receiving customers data from server...");
                         List<Customer> customers = customerSerializer.loadCustomerListFromServerText();
-                         consoleCustomerDisplay.viewAllCustomers(false, customers);
-
-                         menuDisplay.promptToContinue();
-
-                    } else {
+                        consoleCustomerDisplay.viewAllCustomers(Mode.DELETE, customers);
+                        menuDisplay.promptToContinue();
+                    } 
+                    else {
                         System.err.println("Failed to receive employee data.");
                         break;
                     }
@@ -245,25 +280,18 @@ public class Main {
      switch (choice) {
          case "1" -> {//View all items
              System.out.println("Viewing inventory...");
-             responseString=serverCom.sendCommandAndGetResponse("ListItems", util.Constants.VERBOSE_OVERRIDE);
 
-                    if (responseString.equals("SUCCESS")) {
-                        System.out.println("Receiving items data from server...");
-                        List<StockItem> items = stockItemSerializer.loadStockItemListFromText();
-                        System.out.println("Loaded " + items.size() + " items.");
-                         consoleInventoryDisplay.viewEditDeleAllItems(Mode.VIEW, items);
+             try {
+                 List<StockItem> items = commands.getItemListFromServer();
+                 consoleInventoryDisplay.viewEditDeleAllItems(Mode.VIEW, items);
+             } catch (Exception e) {
+                 System.err.println("Error retrieving inventory: " + e.getMessage());
+             }
 
-                    } 
-
-                    else if (responseString.equals("EMPTY")) {
-                        System.err.println("No item data in the server yet.");
-        
-                    }
-                    menuDisplay.promptToContinue();
+                   menuDisplay.promptToContinue();
                     break;
 
-            
-                }
+            }
 
 
 
@@ -280,41 +308,25 @@ public class Main {
 
          case "3" -> {//Edit item quantity
 
-                    responseString=serverCom.sendCommandAndGetResponse("ListItems", util.Constants.VERBOSE_OVERRIDE);
-
-                    System.out.println("Response from server: " + responseString);
-
-                    if (responseString.equals("SUCCESS")) {
-                        System.out.println("Receiving item data from server...");
-                        List<StockItem> stockItems = stockItemSerializer.loadStockItemListFromText();
-                        consoleInventoryDisplay.viewEditDeleAllItems(Mode.EDIT, stockItems);
-
+                     try {
+                 List<StockItem> items = commands.getItemListFromServer();
+                 consoleInventoryDisplay.viewEditDeleAllItems(Mode.EDIT, items);
+             } catch (Exception e) {
+                 System.err.println("Error retrieving inventory: " + e.getMessage());
+             }
                          menuDisplay.promptToContinue();
 
-                    } else {
-                        System.err.println("No item data in the server yet.");
-                    }
-
-                    menuDisplay.promptToContinue();
                     break;
         }
         case "4" -> {
 
-                    responseString=serverCom.sendCommandAndGetResponse("ListItems", util.Constants.VERBOSE_OVERRIDE);
-
-                    System.out.println("Response from server: " + responseString);
-
-                    if (responseString.equals("SUCCESS")) {
-                        System.out.println("Receiving item data from server...");
-                        List<StockItem> stockItems = stockItemSerializer.loadStockItemListFromText();
-                        consoleInventoryDisplay.viewEditDeleAllItems(Mode.DELETE, stockItems);
-
-                         menuDisplay.promptToContinue();
-
-                    } else {
-                        System.err.println("Failed to receive item data.");
-            
-                    }
+                     try {
+                 List<StockItem> items = commands.getItemListFromServer();
+                 consoleInventoryDisplay.viewEditDeleAllItems(Mode.DELETE, items);
+             } catch (Exception e) {
+                 System.err.println("Error retrieving inventory: " + e.getMessage());
+             }
+                            menuDisplay.promptToContinue();
                     break;
         }
 

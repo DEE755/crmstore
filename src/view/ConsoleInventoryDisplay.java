@@ -2,6 +2,7 @@ package view;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import model.inventory.StockItem;
 import servercommunication.ServerCom;
 
@@ -34,7 +35,7 @@ public void displayStockItemList(List<StockItem> stockItems) {
     }
 
 
-    public void viewEditDeleAllItems(Mode mode, List<StockItem> items) throws IOException, ClassNotFoundException {
+    public Optional<StockItem> viewEditDeleAllItems(Mode mode, List<StockItem> items) throws IOException, ClassNotFoundException {
         String responseString;
         StockItem selectedItem;
         int itemId = -1;
@@ -53,6 +54,10 @@ public void displayStockItemList(List<StockItem> stockItems) {
 
         else if (mode == Mode.EDIT) {
             System.out.println("\nWrite the ID of the Item you want to edit and press Enter to continue... Or cancel by pressing Enter without typing anything.");
+        }
+
+        else if (mode == Mode.SELECT) {
+            System.out.println("\nWrite the ID of the Item you want to sell and press Enter to continue... Or cancel by pressing Enter without typing anything.");
         }
 
         // ID of the item to view/edit/delete
@@ -75,7 +80,7 @@ public void displayStockItemList(List<StockItem> stockItems) {
             } catch (NumberFormatException e) {
                 if (input.trim().isEmpty()) {
                     System.out.println("Action cancelled.");
-                    return;
+                    return Optional.empty();
                 } else {
                     System.err.println("Invalid input. Please enter a valid item ID.");
                     selectedItem = null;
@@ -121,12 +126,17 @@ public void displayStockItemList(List<StockItem> stockItems) {
                     }                
                     
                 }
+
+                else if (mode == Mode.SELECT) {
+                    return Optional.of(selectedItem);
+                }   
             }
                 catch(IndexOutOfBoundsException e)
                 {
                     System.out.println("No customer found with the given ID.");
                     
                 }
+                return Optional.empty();
 
     }
 

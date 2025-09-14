@@ -18,7 +18,9 @@ private static ServerCom instance;
 
 
 
-    private ServerCom() {}
+    private  ServerCom() {
+       // Private constructor to prevent instantiation
+    }
 
     public static ServerCom getInstance() {
         if (instance == null) 
