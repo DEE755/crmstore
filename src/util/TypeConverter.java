@@ -7,6 +7,7 @@ import model.customer.NewCustomer;
 import model.customer.ReturningCustomer;
 import model.customer.VIPCustomer;
 import model.inventory.StockItem;
+import servercommunication.ServerCom;
 
 public class TypeConverter {
 
@@ -98,7 +99,8 @@ public static String stockItemToString(StockItem item) {
                         item.getQuantity() + " " +
                         item.getPrice() + " " +
                         item.getId() + " " +
-                        item.getCategory().name();
+                        item.getCategory().name()+ " "+
+                        ServerCom.getInstance().getAssociatedBranch().getId();
     return itemString;
 }
 
@@ -107,7 +109,7 @@ public static String stockItemToString(StockItem item) {
 
 public static StockItem stringToStockItem(String itemString) {
     String[] parts = itemString.split(" ");
-    if (parts.length != 5) {
+    if (parts.length != 6) {
         throw new IllegalArgumentException("Invalid item string: " + itemString);
     }
     String name = parts[0];
@@ -115,6 +117,14 @@ public static StockItem stringToStockItem(String itemString) {
     double price = Double.parseDouble(parts[2]);
     int id = Integer.parseInt(parts[3]);
     StockItem.Category category = StockItem.Category.valueOf(parts[4]);
+    int branchID = Integer.parseInt(parts[5]);
+    int adminID = 1969358043;
+     // Not used currently
+    if (ServerCom.getInstance().getAssociatedBranch().getConnectedEmployee().getRole()!=Employee.Role.ADMIN && ServerCom.getInstance().getAssociatedBranch().getId() != branchID && ServerCom.getInstance().getAssociatedBranch().getConnectedEmployee().getId()!=adminID) 
+    {
+        return null;
+    }
+    
 
     return new StockItem(name, id, quantity, price, category);
 }

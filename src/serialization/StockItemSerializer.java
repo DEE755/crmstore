@@ -56,8 +56,12 @@ public class StockItemSerializer {
             List<StockItem> stockItems = new ArrayList<StockItem>();
             while (!"ENDLIST".equals(stockItemListRawText = reader.readLine()) && stockItemListRawText.length() > 2) {
                 StockItem stockItem = util.TypeConverter.stringToStockItem(stockItemListRawText);
-                stockItems.add(stockItem);
+                if (stockItem != null)
+                {
+                    stockItems.add(stockItem);
+                }
             }
+            
             return stockItems;
         }
         catch (IOException e) {

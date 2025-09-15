@@ -63,7 +63,7 @@ public class Main {
             return;
         }
 
-        System.out.println("=== WELCOME TO MANAGEMENT SYSTEM ===\nPLEASE LOGIN TO CONTINUE");
+        System.out.println("\n\n=== WELCOME TO MANAGEMENT SYSTEM ===\nPLEASE LOGIN TO CONTINUE");
         
         boolean running = true;
 
@@ -74,6 +74,9 @@ public class Main {
             if(currentEmployee.isPresent())
             {
                 associatedBranch.setConnectedEmployee(currentEmployee.get());
+                ServerCom.getInstance().getAssociatedBranch().setConnectedEmployee(currentEmployee.get());
+                ServerCom.getInstance().setAssociatedRole(currentEmployee.get().getRole());
+
                 System.out.println("Login successful. Welcome, " + associatedBranch.getConnectedEmployee().getFirstName() + " " + associatedBranch.getConnectedEmployee().getFamilyName() + " (" + associatedBranch.getConnectedEmployee().getRole() + ") at " + associatedBranch.getName() + " branch.");
             break;
             }
@@ -84,7 +87,7 @@ public class Main {
         while (login.isLoggedIn()) {
             String choice;
             Sale newSale;
-            if (associatedBranch.getConnectedEmployee().getRole() == Employee.Role.SELLER)
+            if (ServerCom.getInstance().getAssociatedRole() == Employee.Role.SELLER || ServerCom.getInstance().getAssociatedRole() == Employee.Role.CASHIER)
             {
             choice = menuDisplay.displayMainMenuSeller();}
             else{
@@ -96,13 +99,14 @@ public class Main {
                 case "1":
                     customerManagement();
                     break;
+
                 case "2":
-                if (associatedBranch.getConnectedEmployee().getRole() == Employee.Role.ADMIN)
+                if (ServerCom.getInstance().getAssociatedRole() == Employee.Role.ADMIN || ServerCom.getInstance().getAssociatedRole() == Employee.Role.SHIFT_MANAGER)
                     employeeManagement();
                     else {
                     
                     try{
-                    newSale=Sale.createSale(associatedBranch.getConnectedEmployee());
+                    newSale=Sale.createSale(ServerCom.getInstance().getAssociatedBranch().getConnectedEmployee());
                     newSale.submitSaleToServer(serverCom, newSale);
                     }
                     catch(Exception e)
@@ -131,6 +135,16 @@ public class Main {
                 case "5":
                     System.out.println("Logging out...");
                     login.logout();
+                    break;
+
+
+                case "6":
+                    if (ServerCom.getInstance().getAssociatedRole() == Employee.Role.ADMIN || ServerCom.getInstance().getAssociatedRole() == Employee.Role.SHIFT_MANAGER) {
+                        commands.displayLogs();
+                    }
+                        
+
+                    menuDisplay.promptToContinue();
                     break;
                 default:
                     System.out.println("Invalid option! Please try again.");
@@ -165,7 +179,7 @@ public class Main {
                     break;
 
                 case "2"://Add new customer
-                    System.out.println("=== ADD NEW CUSTOMER ===");
+                    System.out.println("\n\n=== ADD NEW CUSTOMER ===");
                     Customer newCustomer = consoleCustomerDisplay.createNewCustomer();
 
                     System.out.println("Created new customer: " + newCustomer.toString());
@@ -299,6 +313,11 @@ public class Main {
 
 
         case "2" -> {//Add new item
+            if (ServerCom.getInstance().getAssociatedRole() != Employee.Role.ADMIN && ServerCom.getInstance().getAssociatedRole() != Employee.Role.SHIFT_MANAGER) {
+                System.out.println("You do not have permission to add new items. Returning to inventory menu.");
+                menuDisplay.promptToContinue();
+                break;
+            }
             System.out.println("Adding new product...");
             StockItem newItem = consoleInventoryDisplay.createNewItem();
             System.err.println("Created new item: " + newItem.toString());
@@ -310,6 +329,11 @@ public class Main {
         }
 
          case "3" -> {//Edit product
+            if (ServerCom.getInstance().getAssociatedRole() != Employee.Role.ADMIN && ServerCom.getInstance().getAssociatedRole() != Employee.Role.SHIFT_MANAGER) {
+                System.out.println("You do not have permission to edit items. Returning to inventory menu.");
+                menuDisplay.promptToContinue();
+                break;
+            }
 
             choice=menuDisplay.displayEditProductSubMenu();
             try {
@@ -343,7 +367,12 @@ public class Main {
         
         
 
-        case "4" -> {
+        case "4" -> {//Buy product (restock)
+                    if (ServerCom.getInstance().getAssociatedRole() != Employee.Role.ADMIN && ServerCom.getInstance().getAssociatedRole() != Employee.Role.SHIFT_MANAGER) {
+                        System.out.println("You do not have permission to edit items. Returning to inventory menu.");
+                        menuDisplay.promptToContinue();
+                        break;
+                    }
 
                      try {
                  List<StockItem> items = commands.getItemListFromServer();

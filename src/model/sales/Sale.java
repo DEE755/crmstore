@@ -92,7 +92,7 @@ catch (Exception e){
 public void submitSaleToServer(ServerCom serverCom, Sale sale) throws Exception
 {
 
-    String response=serverCom.sendCommandAndGetResponse("SubmitSale " + sale.toString() + "\n", true);
+    String response=serverCom.sendCommandAndGetResponse("SubmitSale " + sale.toString(), true);
     if (response.equals("SUCCESS")) {
         System.out.println("Sale submitted successfully.");
     } else {
@@ -103,9 +103,9 @@ public void submitSaleToServer(ServerCom serverCom, Sale sale) throws Exception
 @Override 
 public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append(buyer.getId()).append(" ")
+    sb.append(buyer.getEmail()).append(" ")
     .append(itemSold.getId()).append(" ")
-    .append(seller.getId()).append(" ")
+    .append(seller.getEmail()).append(" ")
     .append(salePrice).append(" ")
     .append(quantitySold);
     return sb.toString();

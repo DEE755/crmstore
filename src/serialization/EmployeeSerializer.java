@@ -8,10 +8,8 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.BaseStream;
 import model.Employee;
 import servercommunication.ServerCom;
-import util.*;
 
 public class EmployeeSerializer {
     ServerCom serverCom = ServerCom.getInstance();

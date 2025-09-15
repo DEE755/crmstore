@@ -24,7 +24,7 @@ public class ConsoleEmployeeDisplay extends GeneralDisplay {
 
 
     public void displayEmployeeDetails(Employee employee) {
-        System.out.println("=== EMPLOYEE DETAILS ===");
+        System.out.println("\n\n=== EMPLOYEE DETAILS ===");
         System.out.println("ID: " + employee.getId());
         System.out.println("First Name: " + employee.getFirstName());
         System.out.println("Family Name: " + employee.getFamilyName());
@@ -38,8 +38,9 @@ public class ConsoleEmployeeDisplay extends GeneralDisplay {
 
 
     public void displayEmployeeList(List<Employee> employees) {
-        System.out.println("=== EMPLOYEE LIST ===");
-        for (Employee employee : employees) {
+        List<Employee> filteredEmployees=Employee.filterEmployeesByBranch(employees);
+        System.out.println("=\n\n== EMPLOYEE LIST ===");
+        for (Employee employee : filteredEmployees) {
             System.out.println("ID: " + employee.getId() + " Name: " + employee.getFirstName() + " " + employee.getFamilyName() + " Role: " + employee.getRole() +" Branch: " + employee.getBranch().getName());
         }
         System.out.println("=======================");
@@ -63,7 +64,7 @@ public class ConsoleEmployeeDisplay extends GeneralDisplay {
                 int employeeId = Integer.parseInt(input);
 
                 try{
-                    if (mode == Mode.DELETE)
+                    if (mode != Mode.DELETE)
                     {
                     displayEmployeeDetails(employees.get(Employee.findEmployeeIndexById(employees, employeeId)));
 
@@ -161,10 +162,13 @@ public class ConsoleEmployeeDisplay extends GeneralDisplay {
         do {
             System.out.println("Enter employee password:");
             password = scanner.nextLine();
-            if (password.isEmpty() || password.contains(" ")) {
-                System.out.println("Invalid password. Please try again.");
+            if (password.isEmpty() || password.contains(" ") || 
+                !password.matches(".*[A-Z].*") || 
+                !password.matches(".*\\d.*") || 
+                !password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*")) {
+                System.out.println("Invalid password. You need at least one uppercase letter, one number, and one special character. Please try again.");
             }
-        } while (password.isEmpty() || password.contains(" "));
+        } while (password.isEmpty() || password.contains(" ") || !password.matches(".*[A-Z].*") || !password.matches(".*\\d.*") || !password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*"));
 
 
         do {

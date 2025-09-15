@@ -1,6 +1,7 @@
 package model;
 
 import java.util.List;
+import servercommunication.ServerCom;
 
 public class Employee extends Participant implements java.io.Serializable {
     private String username;
@@ -65,6 +66,17 @@ public class Employee extends Participant implements java.io.Serializable {
         }
         return -1;
     }
+
+
+public static List<Employee> filterEmployeesByBranch(List<Employee> employees) {
+    if (ServerCom.getInstance().getAssociatedRole() == Role.ADMIN) {
+        return employees;
+    }
+    return employees.stream()
+                    .filter(emp -> emp.getBranch().getId() == ServerCom.getInstance().getAssociatedBranch().getId())
+                    .toList();
+
+}
 
 }
 

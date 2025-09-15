@@ -4,6 +4,7 @@ import java.util.Set;
 import main.Main;
 import model.Branch;
 import model.ChatSession;
+import servercommunication.ServerCom;
 
 public class ConsoleChat extends GeneralDisplay {
 
@@ -21,11 +22,10 @@ public class ConsoleChat extends GeneralDisplay {
     }
 
     public int chatManagementPrompt() {
-        System.out.println("=== CHAT ===");
-        System.out.println("1. Start New Chat Session");
+        System.out.println("\n\n=== CHAT ===");
+        System.out.println("1. Send New Message");
         System.out.println("2. View Existing Chat Sessions");
-        System.out.println("3. Send Message");
-        System.out.println("4. Back to Main Menu");
+        System.out.println("3. Back to Main Menu");
         System.out.print("Select an option: ");
         String choice = scanner.nextLine();
         return Integer.parseInt(choice);
@@ -59,13 +59,13 @@ public class ConsoleChat extends GeneralDisplay {
                     break;
                 case 2:
                     System.out.println("Viewing existing chat sessions...");
-                    // Implement view existing chat sessions logic here
+                    commands.viewChatSessions(); 
+
+                    ConsoleMenuDisplay.getInstance().promptToContinue();
+
                     break;
+               
                 case 3:
-                    System.out.println("Sending a message...");
-                    // Implement send message logic here
-                    break;
-                case 4:
                     exit = true;
                     break;
                 default:
@@ -81,7 +81,7 @@ private String promptForMessage() {
 }
 
 public void displayBranches(Set<Branch> branches) {
-    System.out.println("=== BRANCHES ===");
+    System.out.println("\n\n=== BRANCHES ===");
     if (branches.isEmpty()) {
         System.out.println("No branches available.");
     } else {
@@ -90,8 +90,18 @@ public void displayBranches(Set<Branch> branches) {
         for (Branch branch : branches) {
             branchInfo.append(++i).append(": ")
             .append("Branch Name: ").append(branch.getName())
-            .append(" ID:").append(branch.getId())
-            .append("\n");
+            .append(" ID:").append(branch.getId());
+
+            if (branch.isConnected()) {
+                branchInfo.append(" [ONLINE]");
+            } else {
+                branchInfo.append(" [OFFLINE]");
+            }
+            if(branch.getId()==ServerCom.getInstance().getAssociatedBranch().getId()) {
+                branchInfo.append(" (Your Branch)");
+            }
+
+            branchInfo.append("\n");
         }
         System.out.println(branchInfo.toString());
     }
@@ -103,6 +113,10 @@ public Branch promptBranchSelection(Set<Branch> branches) {
         System.out.print("Select a branch by ID: ");
         String input = scanner.nextLine();
         int branchId = Integer.parseInt(input);
+        if (branchId==ServerCom.getInstance().getAssociatedBranch().getId()) {
+            System.out.println("You cannot select your own branch. Please choose a different branch.");
+            return null;
+        }
         for (Branch branch : branches) {
             if (branch.getId() == branchId) {
                 return branch;

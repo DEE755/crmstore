@@ -56,13 +56,17 @@ public Set<Branch> getExistingBranchesFromServer() throws Exception {
 
                     if (responseString.equals("SUCCESS")) {
                         System.out.println("Receiving branches data from server...");
-                        String textBranchesInfo=serverCom.reader.readLine();
+                        StringBuilder textBranchesInfo = new StringBuilder();
+                        String line;
+                        while (!(line = serverCom.reader.readLine()).equals("ENDLIST")) {
+                            textBranchesInfo.append(line).append("\n");
+                        }
                         if (textBranchesInfo==null || textBranchesInfo.isEmpty()) {
                             System.err.println("No branch data in the server.");
                             throw new Exception("No branch data in the server");
                         }
 
-                        Set<Branch> branches = branchSerializer.loadBranchSetFromText(textBranchesInfo);
+                        Set<Branch> branches = branchSerializer.loadBranchSetFromText(textBranchesInfo.toString());
                         return branches;
                     }
 
@@ -85,6 +89,49 @@ public Set<Branch> getExistingBranchesFromServer() throws Exception {
                         throw new Exception("Failed to start chat session. Server response: " + response);
                     }
                     System.out.println("Chat session started successfully.");
+                }
+
+
+                public void viewChatSessions() throws Exception {
+                    String command = "ListChat " + ServerCom.getInstance().getAssociatedBranch().getId();
+
+                    String response = serverCom.sendCommandAndGetResponse(command, util.Constants.VERBOSE_OVERRIDE);
+                    if (response.equals("EMPTY")) {
+                        System.out.println("No chat sessions available.");
+                        return;
+                    } else if (!response.equals("SUCCESS")) {
+                        throw new Exception("Failed to retrieve chat sessions. Server response: " + response);
+                    }
+
+                    System.out.println("Chat Sessions:");
+                    String line;
+                    while (!(line = serverCom.reader.readLine()).equals("ENDLIST")) {
+                        System.out.println(line);
+                    }
+                }
+
+                public void displayLogs() {
+                   
+                    String command = "GetLogs";
+
+                    try {
+                        String response = serverCom.sendCommandAndGetResponse(command, util.Constants.VERBOSE_OVERRIDE);
+                        if (response.equals("EMPTY")) {
+                            System.out.println("No logs available.");
+                            return;
+                        } else if (!response.equals("SUCCESS")) {
+                            throw new Exception("Failed to retrieve logs. Server response: " + response);
+                        }
+
+                        System.out.println("Logs:");
+                        String line;
+                        while (!(line = serverCom.reader.readLine()).equals("ENDLIST")) {
+                            System.out.println(line);
+                        }
+                    } catch (Exception e) {
+                        System.err.println("Error retrieving logs: " + e.getMessage());
+                    }
+
                 }
             }
 

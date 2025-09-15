@@ -27,7 +27,7 @@ public class ConsoleInventoryDisplay extends GeneralDisplay {
 
 
 public void displayStockItemList(List<StockItem> stockItems) {
-    System.out.println("=== STOCK ITEM LIST ===");
+    System.out.println("\n\n=== STOCK ITEM LIST ===");
     for (StockItem stockItem : stockItems) {
         System.out.println(" Product Name: " + stockItem.getName() + " ID: " + stockItem.getId()  + " Quantity: " + stockItem.getQuantity() );
     }
@@ -167,8 +167,7 @@ public StockItem createNewItem() {
             yield StockItem.Category.MISC;
         }
     };
-
-    StockItem newItem = new StockItem(name, quantity, price, category);
+    StockItem newItem = new StockItem(name, quantity, price, category, String.valueOf(serverCom.getAssociatedBranch().getId()));
     return newItem;
 
 }

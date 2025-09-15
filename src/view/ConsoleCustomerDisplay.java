@@ -83,7 +83,7 @@ public class ConsoleCustomerDisplay extends GeneralDisplay {
 
     
     public void displayCustomerDetails(Customer customer) {
-        System.out.println("=== CUSTOMER DETAILS ===");
+        System.out.println("\n\n=== CUSTOMER DETAILS ===");
         System.out.println("ID: " + customer.getId());
         System.out.println("Name: " + customer.getFirstName() + " " + customer.getFamilyName());
         System.out.println("Email: " + customer.getEmail());
@@ -93,7 +93,7 @@ public class ConsoleCustomerDisplay extends GeneralDisplay {
 
 
     public void displayCustomerList(List<Customer> customers) {
-        System.out.println("=== CUSTOMER LIST ===");
+        System.out.println("\n\n=== CUSTOMER LIST ===");
         for (Customer customer : customers) {
             System.out.println("ID: " + customer.getId() + ", Name: " + customer.getFirstName() + " " + customer.getFamilyName());
         }

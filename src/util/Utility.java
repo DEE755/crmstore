@@ -64,4 +64,18 @@ private static CustomerSerializer customerSerializer = CustomerSerializer.getIns
         return scanner.nextInt();
     }
 
+
+
+    
+    public static String readline() throws IOException, InterruptedException {
+    String line = ServerCom.getInstance().reader.readLine();
+    if (line != null && line.startsWith("MESSAGE:")) {
+        System.out.println("[Chat] " + line.substring(8));
+    } else {
+        return line;
+    }
+
+    return line;
+}
+
 }

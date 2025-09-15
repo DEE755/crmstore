@@ -10,6 +10,7 @@ public class StockItem implements java.io.Serializable {
     private double price;
     private int id;
     private Category category;
+    private String branchID;
     
 
     public StockItem(String name, int quantity, double price, Category category) {
@@ -18,6 +19,15 @@ public class StockItem implements java.io.Serializable {
         this.quantity = quantity;
         this.price = price;
         this.category = category;
+    }
+
+    public StockItem(String name, int quantity, double price, Category category, String branchID) {
+        this.name = name;
+        this.id=generateItemId();
+        this.quantity = quantity;
+        this.price = price;
+        this.category = category;
+        this.branchID = branchID;
     }
 
     //FOR EXISTING ITEMS
@@ -81,7 +91,7 @@ public class StockItem implements java.io.Serializable {
     }
 
     public void displayStockItemDetails() {
-        System.out.println("=== STOCK ITEM DETAILS ===");
+        System.out.println("\n\n=== STOCK ITEM DETAILS ===");
         System.out.println("ID: " + getId());
         System.out.println("Name: " + getName());
         System.out.println("Price: " + getPrice());

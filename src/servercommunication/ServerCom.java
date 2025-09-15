@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import model.Branch;
+import model.Employee.Role;
 import util.Constants;
 
 public class ServerCom
@@ -15,10 +16,10 @@ public BufferedReader reader;
 private PrintWriter writer;
 private static Branch associatedBranch;//automatic branch recognition according to client config
 private static ServerCom instance;
+private static Role associatedRole;
 
 
-
-    private  ServerCom() {
+    protected  ServerCom() {
        // Private constructor to prevent instantiation
     }
 
@@ -37,6 +38,9 @@ private static ServerCom instance;
         return this.socket;
         }
     
+        public Branch getAssociatedBranch(){
+            return associatedBranch;
+        }
 
     public void ServerConnection() throws IOException {
             socket = new Socket(Constants.HOST, Constants.PORT);
@@ -62,6 +66,14 @@ private static ServerCom instance;
         while (reader.ready()) {
             reader.readLine();
         }
+    }
+
+    public Role getAssociatedRole() {
+        return associatedRole;
+    }
+
+    public void setAssociatedRole(Role associatedRole) {
+        this.associatedRole = associatedRole;
     }
 
 
