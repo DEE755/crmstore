@@ -62,6 +62,7 @@ public class Branch {
     return Math.abs(name.hashCode());
 }
 
+
     public Employee getConnectedEmployee() {
         return currentEmployee;
     }

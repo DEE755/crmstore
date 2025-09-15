@@ -1,6 +1,7 @@
 package util;
 
 import model.Branch;
+import model.ChatSession;
 import model.Employee;
 import model.customer.Customer;
 import model.customer.NewCustomer;
@@ -148,5 +149,28 @@ public static Branch stringToBranch(String branchString) {
     Employee currentEmployee = new Employee(parts[3], parts[4], "", "", "", "", Employee.Role.SELLER, new Branch(name)); // Temporary branch, will be replaced below
     return new Branch(name, id, isConnected, currentEmployee);
 }
-   
+
+
+
+
+public static ChatSession stringToChatSession(String chatSessionString) {
+                    int sourceBranchIdStart = chatSessionString.indexOf("Sent By:") + 9;
+                    int sourceBranchNameEnd = chatSessionString.indexOf("Branch ") + 6;
+                    
+                    int employeeNameEnd = chatSessionString.indexOf("]", sourceBranchNameEnd);
+                    String employeeFullName = chatSessionString.substring(sourceBranchNameEnd+1, employeeNameEnd);
+                    String employeeFirstName = employeeFullName.split(" ")[0];
+                    String employeeLastName = employeeFullName.split(" ")[1];
+                    Branch destinationBranch = ServerCom.getInstance().getAssociatedBranch();
+                
+                    String sourceBranchName = chatSessionString.substring(sourceBranchIdStart, sourceBranchNameEnd);
+                    Branch sourceBranch = new Branch(sourceBranchName);
+                    System.out.println("Source Branch Name: " + sourceBranch.getName());
+                    Employee sender = new Employee(employeeFirstName, employeeLastName, "", "", "", "", Employee.Role.SELLER, sourceBranch);
+                    sourceBranch.setConnectedEmployee(sender);
+                    ChatSession chatSession = new ChatSession(sourceBranch, destinationBranch);
+                    
+                    chatSession.addMessage(chatSessionString);
+                    return chatSession;
+            }
     }

@@ -28,8 +28,8 @@ public class ChatSession {
 
     public void addMessage(String message) {
         Employee sender = sourceBranch.getConnectedEmployee();
-        
-        String addedInfoMessage = "[" + java.time.LocalDateTime.now() +" - Sent By: " + sender.getFullName() + "] " + message;
+
+        String addedInfoMessage = "[" + java.time.LocalDateTime.now() +" - Sent By: " + sender.getBranch().getName() + " " + sender.getFullName() + "] " + message;
         messageQueue.offer(addedInfoMessage);
 
     }
@@ -79,6 +79,37 @@ public class ChatSession {
         sb.append(destinationBranch.getId()).append(" ")
         .append(getNextMessage());
         return sb.toString();
+    }
+
+    public void switchSourceAndDestination() {
+        Branch temp = sourceBranch;
+        sourceBranch = destinationBranch;
+        destinationBranch = temp;
+    }
+
+    public void printNewMessages() {
+        System.out.println("\n=== New Messages ===");
+        if (messageQueue.isEmpty()) {
+            System.out.println("No new messages.");
+        } else {
+            for (String message : messageQueue) {
+                System.out.println(message);
+            }
+            messageQueue.clear(); // Clear the queue after printing
+        }
+        System.out.println("====================\n");
+    }
+
+    public void printMessageHistory() {
+        System.out.println("\n=== Message History ===");
+        if (messagesHistory.isEmpty()) {
+            System.out.println("No message history.");
+        } else {
+            for (String message : messagesHistory) {
+                System.out.println(message);
+            }
+        }
+        System.out.println("=======================\n");
     }
 
 }

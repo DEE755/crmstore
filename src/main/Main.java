@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import model.Branch;
 import model.Employee;
+import model.Logs;
 import model.customer.Customer;
 import model.inventory.StockItem;
 import model.sales.Sale;
@@ -140,7 +141,13 @@ public class Main {
 
                 case "6":
                     if (ServerCom.getInstance().getAssociatedRole() == Employee.Role.ADMIN || ServerCom.getInstance().getAssociatedRole() == Employee.Role.SHIFT_MANAGER) {
-                        commands.displayLogs();
+                        String logsString = commands.getLogs();
+
+                        Logs activityFullLog = new Logs(logsString);
+
+
+                        menuDisplay.displayLogs(menuDisplay.selectLogType(activityFullLog));
+
                     }
                         
 

@@ -7,6 +7,7 @@ import model.ChatSession;
 import servercommunication.ServerCom;
 
 public class ConsoleChat extends GeneralDisplay {
+    ChatSession newChatSession;
 
     private static ConsoleChat instance;
 
@@ -32,11 +33,15 @@ public class ConsoleChat extends GeneralDisplay {
     }
 
 
+   
+
+
 
     public void chatManagement() throws Exception {
         boolean exit = false;
         while (!exit) {
             int choice = chatManagementPrompt();
+            
             switch (choice) {
                 case 1:
                     System.out.println("Starting a new chat session...");
@@ -49,17 +54,31 @@ public class ConsoleChat extends GeneralDisplay {
                          chosenBranch = promptBranchSelection(branches);
                     } while (chosenBranch == null);
 
-                    ChatSession newChatSession = new ChatSession(Main.associatedBranch, chosenBranch);
+                    newChatSession = new ChatSession(Main.associatedBranch, chosenBranch);
 
                     newChatSession.addMessage(promptForMessage());
 
-                    commands.startChatSession(newChatSession);
+                    commands.startOrContinueChatSession(newChatSession);
                     
 
                     break;
                 case 2:
                     System.out.println("Viewing existing chat sessions...");
-                    commands.viewChatSessions(); 
+
+                    newChatSession = commands.getChatSessionsForCurrentBranch();
+
+
+                    newChatSession.printNewMessages();
+
+                    String answer = promptForAnswer();
+                    if (!answer.isEmpty()) {
+                        newChatSession.addMessage(answer);
+                        newChatSession.switchSourceAndDestination();
+
+                        System.out.println("Branch: " + newChatSession.getDestinationBranch().getName() + " ID: " + newChatSession.getDestinationBranch().getId());
+                        commands.startOrContinueChatSession(newChatSession);
+                        
+                    }
 
                     ConsoleMenuDisplay.getInstance().promptToContinue();
 
@@ -106,6 +125,18 @@ public void displayBranches(Set<Branch> branches) {
         System.out.println(branchInfo.toString());
     }
 }
+
+
+public String promptForAnswer(){
+    System.out.print("Do you want to answer this chat? (Y/N): ");
+    String input = scanner.nextLine();
+    if (input.equalsIgnoreCase("Y")) {
+       return promptForMessage();
+    } else {
+        return "";
+    }
+}
+
 
 public Branch promptBranchSelection(Set<Branch> branches) {
 

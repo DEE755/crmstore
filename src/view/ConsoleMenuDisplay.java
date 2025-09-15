@@ -1,5 +1,9 @@
 package view;
 
+import java.util.List;
+import model.Logs;
+import model.Logs.Log;
+
 public class ConsoleMenuDisplay extends GeneralDisplay
 {
     
@@ -93,4 +97,38 @@ public class ConsoleMenuDisplay extends GeneralDisplay
         }while(!choice.matches("[1-2]"));
         return choice;
     }
+
+
+
+    public List <Log> selectLogType(Logs activityFullLog) {
+        String choice;
+        System.out.println("\n=== VIEW LOGS ===");
+        System.out.println("1. View All Logs");
+        System.out.println("2. View BUYING Logs");
+        System.out.println("3. View MESSAGE Logs");
+        System.out.println("4. View SALES Logs");
+        System.out.println("5. View ADDED Logs");
+        System.out.println("6. View STOCK Logs");
+        System.out.println("7. View OTHER Logs");
+
+        do {
+            System.out.print("Choose option (1-7): ");
+            choice = scanner.nextLine();
+        } while (!choice.matches("[1-7]"));
+        int choiceInt = Integer.parseInt(choice);
+        return activityFullLog.filterLogsByType(choiceInt);
 }
+
+public void displayLogs(List<Log> logs) {
+    System.out.println("\n=== LOG ENTRIES ===");
+    if (logs.isEmpty()) {
+        System.out.println("No log entries found for the selected type.");
+    } else {
+        for (Log log : logs) {
+            System.out.println(log.getLog());
+        }
+    }
+}
+}
+
+
